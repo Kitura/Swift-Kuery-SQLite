@@ -42,15 +42,13 @@ public class SwiftKuerySQLite: Connection {
     }
 
     public func connect(onCompletion: (QueryError?) -> ()) {
-        let _ = sqlite3_open(location.description, &connection)
-
-        let error: String? = String(validatingUTF8: sqlite3_errmsg(connection))
+        let resultCode = sqlite3_open(location.description, &connection)
         var queryError: QueryError? = nil
-        if error != nil && !error!.isEmpty {
+        if resultCode != SQLITE_OK {
+            let error: String? = String(validatingUTF8: sqlite3_errmsg(connection))
             queryError = QueryError.connection(error!)
         }
         onCompletion(queryError)
-        
     }
     
     public func descriptionOf(query: Query) -> String {
@@ -85,24 +83,23 @@ public class SwiftKuerySQLite: Connection {
         var result = Result()
         let resultCode = sqlite3_exec(connection, query, {
             (data, cols, colText, colName) -> Int32 in
+                let values = data?.assumingMemoryBound(to: Result.self)
+                let intcols: Int = Int(cols)
 
-            let values = data?.assumingMemoryBound(to: Result.self)
-            let intcols: Int = Int(cols)
-
-            if (values?.pointee.columnNames.count)! < intcols {
-                for j in 0..<intcols {
-                    values?.pointee.columnNames.append(String(cString: (colName?[j])!))
+                if (values?.pointee.columnNames.count)! < intcols {
+                    for j in 0..<intcols {
+                        values?.pointee.columnNames.append(String(cString: (colName?[j])!))
+                    }
                 }
-            }
 
-            var singleRow = [Any]()
-            for i in 0..<intcols {
-                singleRow.append(String(cString: (colText?[i])!))
-            }
-            values?.pointee.results.append(singleRow)
-            values?.pointee.returnedResult = true
-            
-            return 0
+                var singleRow = [Any]()
+                for i in 0..<intcols {
+                    singleRow.append(String(cString: (colText?[i])!))
+                }
+                values?.pointee.results.append(singleRow)
+                values?.pointee.returnedResult = true
+
+                return 0
             }, &result, &errmsg)
         
         if let errmsg = errmsg {
@@ -117,7 +114,6 @@ public class SwiftKuerySQLite: Connection {
                 onCompletion(.successNoData)
             }
         } else {
-            print(resultCode)
             onCompletion(.error(QueryError.databaseError("Something went wrong")))
         }
     }
