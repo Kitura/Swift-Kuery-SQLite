@@ -51,7 +51,7 @@ class KueryTests: XCTestCase {
     func testInsert() {
         let t = MyTableInsert()
 
-        let connection = SwiftKuerySQLite(filename: getPath(), options: [.readOnly(false)])
+        let connection = SwiftKuerySQLite(filename: getPath())
         performTest(asyncTasks: { expectation in
 
             connection.connect() { error in
@@ -140,10 +140,10 @@ class KueryTests: XCTestCase {
     func testSelect() {
         let t = MyTableSelect()
 
-        let connection = SwiftKuerySQLite(filename: getPath(), options: [.readOnly(false)])
+        let connection = SwiftKuerySQLite(filename: getPath())
         performTest(asyncTasks: { expectation in
             connection.connect() { error in
-                XCTAssertNil(error, "Error connecting to PostgreSQL server: \(error)")
+                XCTAssertNil(error, "Error connecting to SQLite server: \(error)")
 
                 connection.execute("DROP TABLE " + tableNameSelect) { result in
 
@@ -310,10 +310,10 @@ class KueryTests: XCTestCase {
     func testUpdateAndDelete () {
         let t = MyTableUpdate()
 
-        let connection = SwiftKuerySQLite(filename: getPath(), options: [.readOnly(false)])
+        let connection = SwiftKuerySQLite(filename: getPath())
         performTest(asyncTasks: { expectation in
             connection.connect() { error in
-                XCTAssertNil(error, "Error connecting to PostgreSQL server: \(error)")
+                XCTAssertNil(error, "Error connecting to SQLite server: \(error)")
 
                 connection.execute("DROP TABLE " + tableNameUpdate) { result in
 
