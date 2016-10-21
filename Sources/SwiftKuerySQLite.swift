@@ -101,11 +101,6 @@ public class SwiftKuerySQLite: Connection {
 
                 return 0
             }, &result, &errmsg)
-        
-        if let errmsg = errmsg {
-            onCompletion(.error(QueryError.databaseError(String(cString: errmsg))))
-            //sqlite3_free(&connection)
-        }
 
         if resultCode == SQLITE_OK {
             if result.returnedResult {
@@ -113,8 +108,8 @@ public class SwiftKuerySQLite: Connection {
             } else {
                 onCompletion(.successNoData)
             }
-        } else {
-            onCompletion(.error(QueryError.databaseError("Something went wrong")))
+        } else if let errmsg = errmsg {
+            onCompletion(.error(QueryError.databaseError(String(cString: errmsg))))
         }
     }
 }
