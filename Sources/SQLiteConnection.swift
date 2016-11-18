@@ -23,8 +23,9 @@ import SwiftKuery
 
 import Foundation
 
-// https://sqlite.org/capi3ref.html
-public class SwiftKuerySQLite: Connection {
+/// An implementation of `SwiftKuery.Connection` protocol for SQLite.
+/// Please see [SQLite manual](https://sqlite.org/capi3ref.html) for details.
+public class SQLiteConnection: Connection {
 
     /// Stores all the results of the query
     private struct Result {
@@ -33,8 +34,10 @@ public class SwiftKuerySQLite: Connection {
         var returnedResult: Bool = false
     }
 
-    private var connection: OpaquePointer? = nil///???
+    private var connection: OpaquePointer?
     private var location: Location
+
+    /// The `QueryBuilder` with SQLite specific substitutions.
     public var queryBuilder: QueryBuilder
 
     /// Initialiser to create a SwiftKuerySQLite instance
@@ -46,7 +49,11 @@ public class SwiftKuerySQLite: Connection {
     public init(_ location: Location = .inMemory, options: [ConnectionOptions]? = nil) {
         self.location = location
         self.queryBuilder = QueryBuilder()
-        queryBuilder.updateNames([QueryBuilder.QueryNames.ascd : "ASC", QueryBuilder.QueryNames.ucase : "UPPER", QueryBuilder.QueryNames.lcase : "LOWER", QueryBuilder.QueryNames.len : "LENGTH"])
+        queryBuilder.updateSubstitutions(
+            [
+             QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
+             QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
+             QueryBuilder.QuerySubstitutionNames.len : "LENGTH"])
     }
 
     /// Initialiser with a path to where the DB is stored
@@ -72,8 +79,8 @@ public class SwiftKuerySQLite: Connection {
         onCompletion(queryError)
     }
 
-    public func descriptionOf(query: Query) -> String {
-        return query.build(queryBuilder: queryBuilder)
+    public func descriptionOf(query: Query) throws -> String {
+        return try query.build(queryBuilder: queryBuilder)
     }
 
     /// Close the connection to the DB
@@ -84,24 +91,44 @@ public class SwiftKuerySQLite: Connection {
         }
     }
 
-    public func execute(query: Query, parameters: Any..., onCompletion: (@escaping (QueryResult) -> ())) {
-
-    }
-
-    /// Executes a query
+    /// Executes a query.
     ///
     /// - parameter query:        The query to execute
     /// - parameter onCompletion: The result
     public func execute(query: Query, onCompletion: @escaping ((QueryResult) -> ())) {
-        let sqliteQuery = query.build(queryBuilder: queryBuilder)
-        executeQuery(query: sqliteQuery, onCompletion: onCompletion)
+        do {
+            let sqliteQuery = try query.build(queryBuilder: queryBuilder)
+            executeQuery(query: sqliteQuery, onCompletion: onCompletion)
+        }
+        catch QueryError.syntaxError(let error) {
+            onCompletion(.error(QueryError.syntaxError(error)))
+        }
+        catch {
+            onCompletion(.error(QueryError.syntaxError("Failed to build the query")))
+        }
     }
 
-    /// Executes a raw query
+    /// Executes a raw query.
     ///
     /// - parameter raw:          The full raw query to execute
     /// - parameter onCompletion: The result
     public func execute(_ raw: String, onCompletion: @escaping ((QueryResult) -> ())) {
+        executeQuery(query: raw, onCompletion: onCompletion)
+    }
+
+    /// Execute a query with parameters.
+    ///
+    /// - Parameter query: The query to execute.
+    /// - Parameter parameters: An array of the parameters.
+    /// - Parameter onCompletion: The function to be called once the execution of the query is completed.
+    public func execute(query: Query, parameters: [Any], onCompletion: (@escaping (QueryResult) -> ())) {
+    }
+
+    /// Executes a raw query with parameters.
+    ///
+    /// - parameter raw:          The full raw query to execute
+    /// - parameter onCompletion: The result
+    public func execute(_ raw: String, parameters: [Any], onCompletion: @escaping ((QueryResult) -> ())) {
         executeQuery(query: raw, onCompletion: onCompletion)
     }
 

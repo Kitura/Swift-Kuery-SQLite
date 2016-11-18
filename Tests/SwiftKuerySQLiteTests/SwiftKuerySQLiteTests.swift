@@ -43,15 +43,13 @@ class KueryTests: XCTestCase {
         let a = Column("a")
         let b = Column("b")
 
-        public override var name: String {
-            return tableNameInsert
-        }
+        let tableName = tableNameInsert
     }
 
     func testInsert() {
         let t = MyTableInsert()
 
-        let connection = SwiftKuerySQLite(filename: getPath())
+        let connection = SQLiteConnection(filename: getPath())
         performTest(asyncTasks: { expectation in
 
             connection.connect() { error in
@@ -67,7 +65,7 @@ class KueryTests: XCTestCase {
                         KueryTests.printSuccess(result: result)
 
                         let i1 = Insert(into: t, values: "apple", 10)
-                        print("=======\(connection.descriptionOf(query: i1))=======")
+                        //print("=======\(connection.descriptionOf(query: i1))=======")
                         connection.execute(query: i1) { result in
                             XCTAssertEqual(result.success, true, "INSERT failed")
                             XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -75,7 +73,7 @@ class KueryTests: XCTestCase {
                             KueryTests.printSuccess(result: result)
 
                             let i2 = Insert(into: t, valueTuples: (t.a, "appricot"), (t.b, "3"))
-                            print("=======\(connection.descriptionOf(query: i2))=======")
+                            //print("=======\(connection.descriptionOf(query: i2))=======")
                             connection.execute(query: i2) { result in
                                 XCTAssertEqual(result.success, true, "INSERT failed")
                                 XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -83,7 +81,7 @@ class KueryTests: XCTestCase {
                                 KueryTests.printSuccess(result: result)
 
                                 let i3 = Insert(into: t, columns: [t.a, t.b], values: ["banana", 17])
-                                print("=======\(connection.descriptionOf(query: i3))=======")
+                                //print("=======\(connection.descriptionOf(query: i3))=======")
                                 connection.execute(query: i3) { result in
                                     XCTAssertEqual(result.success, true, "INSERT failed")
                                     XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -91,7 +89,7 @@ class KueryTests: XCTestCase {
                                     KueryTests.printSuccess(result: result)
 
                                     let i4 = Insert(into: t, rows: [["apple", 17], ["banana", -7], ["banana", 27]])
-                                    print("=======\(connection.descriptionOf(query: i4))=======")
+                                    //print("=======\(connection.descriptionOf(query: i4))=======")
                                     connection.execute(query: i4) { result in
                                         XCTAssertEqual(result.success, true, "INSERT failed")
                                         XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -99,7 +97,7 @@ class KueryTests: XCTestCase {
                                         KueryTests.printSuccess(result: result)
 
                                         let s1 = Select(from: t)
-                                        print("=======\(connection.descriptionOf(query: s1))=======")
+                                        //print("=======\(connection.descriptionOf(query: s1))=======")
                                         connection.execute(query: s1) { result in
                                             XCTAssertEqual(result.success, true, "SELECT failed")
                                             XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -109,7 +107,7 @@ class KueryTests: XCTestCase {
                                             KueryTests.printResultAsRows(result: result)
 
                                             let drop = Raw(query: "DROP TABLE", table: t)
-                                            print("=======\(connection.descriptionOf(query: drop))=======")
+                                            //print("=======\(connection.descriptionOf(query: drop))=======")
                                             drop.execute(connection) { result in
                                                 XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                                 XCTAssertNil(result.asError, "Error in DELETE: \(result.asError)")
@@ -132,15 +130,13 @@ class KueryTests: XCTestCase {
         let a = Column("a")
         let b = Column("b")
 
-        public override var name: String {
-            return tableNameSelect
-        }
+        let tableName = tableNameSelect
     }
 
     func testSelect() {
         let t = MyTableSelect()
 
-        let connection = SwiftKuerySQLite(filename: getPath())
+        let connection = SQLiteConnection(filename: getPath())
         performTest(asyncTasks: { expectation in
             connection.connect() { error in
                 XCTAssertNil(error, "Error connecting to SQLite server: \(error)")
@@ -155,7 +151,7 @@ class KueryTests: XCTestCase {
                         KueryTests.printSuccess(result: result)
 
                         let i1 = Insert(into: t, rows: [["apple", 10], ["appricot", 3], ["banana", 17], ["apple", 17], ["banana", -7], ["banana", 27]])
-                        print("=======\(connection.descriptionOf(query: i1))=======")
+                        //print("=======\(connection.descriptionOf(query: i1))=======")
                         connection.execute(query: i1) { result in
                             XCTAssertEqual(result.success, true, "INSERT failed")
                             XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -163,7 +159,7 @@ class KueryTests: XCTestCase {
                             KueryTests.printSuccess(result: result)
 
                             let s1 = Select(from: t)
-                            print("=======\(connection.descriptionOf(query: s1))=======")
+                            //print("=======\(connection.descriptionOf(query: s1))=======")
                             connection.execute(query: s1) { result in
                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                 XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -174,7 +170,7 @@ class KueryTests: XCTestCase {
 
                                 let sd1 = Select.distinct(t.a, from: t)
                                     .where(t.a.like("b%"))
-                                print("=======\(connection.descriptionOf(query: sd1))=======")
+                                //print("=======\(connection.descriptionOf(query: sd1))=======")
                                 connection.execute(query: sd1) { result in
                                     XCTAssertEqual(result.success, true, "SELECT failed")
                                     XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -185,8 +181,8 @@ class KueryTests: XCTestCase {
 
                                     let s3 = Select(t.b, t.a, from: t)
                                         .where(((t.a == "banana") || (ucase(t.a) == "APPLE")) && (t.b == 27 || t.b == -7 || t.b == 17))
-                                        .order(by: .ASCD(t.b), .DESC(t.a))
-                                    print("=======\(connection.descriptionOf(query: s3))=======")
+                                        .order(by: .ASC(t.b), .DESC(t.a))
+                                    //print("=======\(connection.descriptionOf(query: s3))=======")
                                     connection.execute(query: s3) { result in
                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                         XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -202,7 +198,7 @@ class KueryTests: XCTestCase {
                                             .group(by: t.a)
                                             .order(by: .DESC(t.a))
                                             .having(sum(t.b) > 3)
-                                        print("=======\(connection.descriptionOf(query: s4))=======")
+                                        //print("=======\(connection.descriptionOf(query: s4))=======")
                                         connection.execute(query: s4) { result in
                                             XCTAssertEqual(result.success, true, "SELECT failed")
                                             XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -215,7 +211,7 @@ class KueryTests: XCTestCase {
                                             let s5 = Select(t.a, t.b, from: t)
                                                 .limit(to: 2)
                                                 .order(by: .DESC(t.a))
-                                            print("=======\(connection.descriptionOf(query: s5))=======")
+                                            //print("=======\(connection.descriptionOf(query: s5))=======")
                                             connection.execute(query: s5) { result in
                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                 XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -227,7 +223,7 @@ class KueryTests: XCTestCase {
 
                                                 let s6 = Select(ucase(t.a).as("upper"), t.b, from: t)
                                                     .where(t.a.between("appra", and: "apprt"))
-                                                print("=======\(connection.descriptionOf(query: s6))=======")
+                                                //print("=======\(connection.descriptionOf(query: s6))=======")
                                                 connection.execute(query: s6) { result in
                                                     XCTAssertEqual(result.success, true, "SELECT failed")
                                                     XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -240,7 +236,7 @@ class KueryTests: XCTestCase {
 
                                                     let s7 = Select(from: t)
                                                         .where(t.a.in("apple", "lalala"))
-                                                    print("=======\(connection.descriptionOf(query: s7))=======")
+                                                    //print("=======\(connection.descriptionOf(query: s7))=======")
                                                     connection.execute(query: s7) { result in
                                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                                         XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -252,7 +248,7 @@ class KueryTests: XCTestCase {
 
                                                         let s8 = Select(from: t)
                                                             .where("a IN ('apple', 'lalala')")
-                                                        print("=======\(connection.descriptionOf(query: s8))=======")
+                                                        //print("=======\(connection.descriptionOf(query: s8))=======")
                                                         connection.execute(query: s8) { result in
                                                             XCTAssertEqual(result.success, true, "SELECT failed")
                                                             XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -274,7 +270,7 @@ class KueryTests: XCTestCase {
                                                                 KueryTests.printResultAsRows(result: result)
 
                                                                 let drop = Raw(query: "DROP TABLE", table: t)
-                                                                print("=======\(connection.descriptionOf(query: drop))=======")
+                                                                //print("=======\(connection.descriptionOf(query: drop))=======")
                                                                 drop.execute(connection) { result in
                                                                     XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                                                     XCTAssertNil(result.asError, "Error in DELETE: \(result.asError)")
@@ -302,15 +298,13 @@ class KueryTests: XCTestCase {
         let a = Column("a")
         let b = Column("b")
 
-        public override var name: String {
-            return tableNameUpdate
-        }
+        let name = tableNameUpdate
     }
 
     func testUpdateAndDelete () {
         let t = MyTableUpdate()
 
-        let connection = SwiftKuerySQLite(filename: getPath())
+        let connection = SQLiteConnection(filename: getPath())
         performTest(asyncTasks: { expectation in
             connection.connect() { error in
                 XCTAssertNil(error, "Error connecting to SQLite server: \(error)")
@@ -325,7 +319,7 @@ class KueryTests: XCTestCase {
                         KueryTests.printSuccess(result: result)
 
                         let i1 = Insert(into: t, rows: [["apple", 10], ["appricot", 3], ["banana", 17], ["apple", 17], ["banana", -7], ["banana", 27]])
-                        print("=======\(connection.descriptionOf(query: i1))=======")
+                        //print("=======\(connection.descriptionOf(query: i1))=======")
                         connection.execute(query: i1) { result in
                             XCTAssertEqual(result.success, true, "INSERT failed")
                             XCTAssertNil(result.asError, "Error in INSERT: \(result.asError)")
@@ -333,7 +327,7 @@ class KueryTests: XCTestCase {
                             KueryTests.printSuccess(result: result)
 
                             let s1 = Select(from: t)
-                            print("=======\(connection.descriptionOf(query: s1))=======")
+                            //print("=======\(connection.descriptionOf(query: s1))=======")
                             connection.execute(query: s1) { result in
                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                 XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -342,9 +336,9 @@ class KueryTests: XCTestCase {
 
                                 KueryTests.printResultAsRows(result: result)
 
-                                let u1 = Update(table: t, set: [(t.a, "peach"), (t.b, 2)])
+                                let u1 = Update(t, set: [(t.a, "peach"), (t.b, 2)])
                                     .where(t.a == "banana")
-                                print("=======\(connection.descriptionOf(query: u1))=======")
+                                //print("=======\(connection.descriptionOf(query: u1))=======")
                                 connection.execute(query: u1) { result in
                                     XCTAssertEqual(result.success, true, "UPDATE failed")
                                     XCTAssertNil(result.asError, "Error in UPDATE: \(result.asError)")
@@ -353,21 +347,21 @@ class KueryTests: XCTestCase {
 
                                     let s2 = Select(t.a, t.b, from: t)
                                         .where(t.a == "banana")
-                                    print("=======\(connection.descriptionOf(query: s2))=======")
+                                    //print("=======\(connection.descriptionOf(query: s2))=======")
                                     connection.execute(query: s2) { result in
                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                         XCTAssertNil(result.asRows, "SELECT returned some rows")
 
                                         let d1 = Delete(from: t)
                                             .where(t.b == "2")
-                                        print("=======\(connection.descriptionOf(query: d1))=======")
+                                        //print("=======\(connection.descriptionOf(query: d1))=======")
                                         connection.execute(query: d1) { result in
                                             XCTAssertEqual(result.success, true, "DELETE failed")
                                             XCTAssertNil(result.asError, "Error in DELETE: \(result.asError)")
 
                                             KueryTests.printSuccess(result: result)
 
-                                            print("=======\(connection.descriptionOf(query: s1))=======")
+                                            //print("=======\(connection.descriptionOf(query: s1))=======")
                                             connection.execute(query: s1) { result in
                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                 XCTAssertNotNil(result.asRows, "SELECT returned no rows")
@@ -377,7 +371,7 @@ class KueryTests: XCTestCase {
                                                 KueryTests.printResultAsRows(result: result)
 
                                                 let d2 = Delete(from: t)
-                                                print("=======\(connection.descriptionOf(query: d2))=======")
+                                                //print("=======\(connection.descriptionOf(query: d2))=======")
                                                 connection.execute(query: d2) { result in
                                                     XCTAssertEqual(result.success, true, "DELETE failed")
                                                     XCTAssertNil(result.asError, "Error in DELETE: \(result.asError)")
@@ -385,7 +379,7 @@ class KueryTests: XCTestCase {
                                                     KueryTests.printSuccess(result: result)
 
                                                     let s1 = Select(from: t)
-                                                    print("=======\(connection.descriptionOf(query: s1))=======")
+                                                    //print("=======\(connection.descriptionOf(query: s1))=======")
                                                     s1.execute(connection) { result in
                                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                                         XCTAssertNil(result.asRows, "SELECT returned some rows")
@@ -393,7 +387,7 @@ class KueryTests: XCTestCase {
                                                         KueryTests.printResultAsRows(result: result)
 
                                                         let drop = Raw(query: "DROP TABLE", table: t)
-                                                        print("=======\(connection.descriptionOf(query: drop))=======")
+                                                        //print("=======\(connection.descriptionOf(query: drop))=======")
                                                         drop.execute(connection) { result in
                                                             XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                                             XCTAssertNil(result.asError, "Error in DELETE: \(result.asError)")
