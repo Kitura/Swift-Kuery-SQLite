@@ -298,7 +298,7 @@ class KueryTests: XCTestCase {
         let a = Column("a")
         let b = Column("b")
 
-        let name = tableNameUpdate
+        let tableName = tableNameUpdate
     }
 
     func testUpdateAndDelete () {
