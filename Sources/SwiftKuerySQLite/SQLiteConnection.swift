@@ -18,7 +18,7 @@ import SwiftKuery
 #if os(Linux)
     import CSQLiteLinux
 #else
-    import CSQLiteMac
+    import CSQLiteDarwin
 #endif
 
 import Foundation
