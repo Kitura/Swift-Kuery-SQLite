@@ -19,8 +19,10 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftKuerySQLite",
+    targets: [Target(name: "SwiftKuerySQLite", dependencies: [.Target(name: "CSQLite")]),
+              Target(name: "CSQLite")
+    ],
     dependencies: [
-        .Package(url: "https://github.com/IBM-Swift/Csqlite.git", majorVersion: 0, minor: 0),
         .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 0),
         ],
     exclude: ["Configuration", "Scripts"]
