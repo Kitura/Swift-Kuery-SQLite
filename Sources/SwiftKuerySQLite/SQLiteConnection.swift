@@ -122,6 +122,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called once the execution of the query is completed.
     public func execute(query: Query, parameters: [Any], onCompletion: (@escaping (QueryResult) -> ())) {
+        execute(query: query, onCompletion: onCompletion)
     }
 
     /// Executes a raw query with parameters.
