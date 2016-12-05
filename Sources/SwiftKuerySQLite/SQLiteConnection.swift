@@ -174,7 +174,7 @@ public class SQLiteConnection: Connection {
 
         if resultCode == SQLITE_OK {
             if result.returnedResult {
-                onCompletion(.rows(titles: result.columnNames, rows: result.results))
+                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(titles: result.columnNames, rows: result.results))))
             } else {
                 onCompletion(.successNoData)
             }

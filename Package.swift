@@ -23,7 +23,7 @@ let package = Package(
               Target(name: "CSQLite")
     ],
     dependencies: [
-        .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 0),
+        .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 2),
         ],
     exclude: ["Configuration", "Scripts"]
 )
