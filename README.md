@@ -27,13 +27,13 @@ $ sudo apt-get install sqlite3 libsqlite3-dev
 First create an instance of `Swift-Kuery-SQLite` by calling:
 
 ```swift
-let connection = SQLiteConnection(filename: "myDB.db")
+let db = SQLiteConnection(filename: "myDB.db")
 ```
 
 To establish a connection call:
 
 ```swift
-SQLiteConnection.connect(onCompletion: (QueryError?) -> ())
+db.connect(onCompletion: (QueryError?) -> ())
 ```
 
 You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the [Kuery](https://github.com/IBM-Swift/Swift-Kuery) documentation for more information.
