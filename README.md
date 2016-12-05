@@ -10,7 +10,7 @@ SQLite plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) fr
 
 ## SQLite installation
 
-To use Swift-Kuery-SQLite you must have the appropriate PostgreSQL C-language client installed.
+To use Swift-Kuery-SQLite you must install SQLite.
 
 ### macOS
 ```
