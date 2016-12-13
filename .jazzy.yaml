@@ -11,7 +11,6 @@ readme: README.md
 skip_undocumented: false
 hide_documentation_coverage: false
 
-#xcodebuild_arguments: [-scheme, SwiftKuerySQLite]
 xcodebuild_arguments: [-project, SwiftKuerySQLite.xcodeproj, -target, SwiftKuerySQLite]
 
 
