@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SQLiteConnection Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Class/SQLiteConnection" class="dashAnchor"></a>
+
+    <a title="SQLiteConnection Class Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          SwiftKuerySQLite Docs
+        </a>
+         (81% documented)
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/IBM-Swift/Swift-Kuery-SQLite">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">SwiftKuerySQLite Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      SQLiteConnection Class Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SQLiteConnection.html">SQLiteConnection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SQLiteResultFetcher.html">SQLiteResultFetcher</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums.html#/s:O16SwiftKuerySQLite17ConnectionOptions">ConnectionOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Location.html">Location</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>SQLiteConnection</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">SQLiteConnection</span><span class="p">:</span> <span class="kt">Connection</span></code></pre>
+
+                </div>
+              </div>
+            <p>An implementation of <code>SwiftKuery.Connection</code> protocol for SQLite.
+Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for details.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vC16SwiftKuerySQLite16SQLiteConnection12queryBuilderC10SwiftKuery12QueryBuilder"></a>
+                    <a name="//apple_ref/swift/Property/queryBuilder" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vC16SwiftKuerySQLite16SQLiteConnection12queryBuilderC10SwiftKuery12QueryBuilder">queryBuilder</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The <code>QueryBuilder</code> with SQLite specific substitutions.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">queryBuilder</span><span class="p">:</span> <span class="kt">QueryBuilder</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnectioncFTOS_8Location7optionsGSqGSaOS_17ConnectionOptions___S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(_:options:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnectioncFTOS_8Location7optionsGSqGSaOS_17ConnectionOptions___S0_">init(_:options:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialiser to create a SwiftKuerySQLite instance</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">_</span> <span class="nv">location</span><span class="p">:</span> <span class="kt"><a href="../Enums/Location.html">Location</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">inMemory</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums.html#/s:O16SwiftKuerySQLite17ConnectionOptions">ConnectionOptions</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>location</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Describes where the db is stored</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>options</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>not used currently</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>self</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnectioncFT8filenameSS7optionsGSqGSaOS_17ConnectionOptions___S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(filename:options:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnectioncFT8filenameSS7optionsGSqGSaOS_17ConnectionOptions___S0_">init(filename:options:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialiser with a path to where the DB is stored</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">filename</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums.html#/s:O16SwiftKuerySQLite17ConnectionOptions">ConnectionOptions</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>filename</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The path where the DB is stored</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>options</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>not used currently</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>self</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7connectFT12onCompletionFGSqO10SwiftKuery10QueryError_T__T_"></a>
+                    <a name="//apple_ref/swift/Method/connect(onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7connectFT12onCompletionFGSqO10SwiftKuery10QueryError_T__T_">connect(onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Connects to the DB</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">connect</span><span class="p">(</span><span class="nv">onCompletion</span><span class="p">:</span> <span class="p">(</span><span class="kt">QueryError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">())</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>callback returning an error or a nil if successful</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP10SwiftKuery10Connection13descriptionOfFzT5queryPS_5Query__SS"></a>
+                    <a name="//apple_ref/swift/Method/descriptionOf(query:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP10SwiftKuery10Connection13descriptionOfFzT5queryPS_5Query__SS">descriptionOf(query:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Connects to the DB</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">descriptionOf</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The query.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A String representation of the query.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection15closeConnectionFT_T_"></a>
+                    <a name="//apple_ref/swift/Method/closeConnection()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection15closeConnectionFT_T_">closeConnection()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Close the connection to the DB</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">closeConnection</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_12onCompletionFOS1_11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(query:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_12onCompletionFOS1_11QueryResultT__T_">execute(query:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Executes a query.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">,</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">((</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The query to execute</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The result</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS12onCompletionFO10SwiftKuery11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(_:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS12onCompletionFO10SwiftKuery11QueryResultT__T_">execute(_:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Executes a raw query.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="n">_</span> <span class="nv">raw</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">((</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>raw</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The full raw query to execute</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The result</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_10parametersGSaP__12onCompletionFOS1_11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(query:parameters:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_10parametersGSaP__12onCompletionFOS1_11QueryResultT__T_">execute(query:parameters:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Execute a query with parameters.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: The query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter parameters: An array of the parameters.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called once the execution of the query is completed.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">Any</span><span class="p">],</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="p">(</span><span class="kd">@escaping</span> <span class="p">(</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The query to execute.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>parameters</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An array of the parameters.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The function to be called once the execution of the query is completed.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS10parametersGSaP__12onCompletionFO10SwiftKuery11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(_:parameters:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS10parametersGSaP__12onCompletionFO10SwiftKuery11QueryResultT__T_">execute(_:parameters:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Executes a raw query with parameters.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="n">_</span> <span class="nv">raw</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">Any</span><span class="p">],</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">((</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>raw</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The full raw query to execute</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The result</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2016 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2016-12-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

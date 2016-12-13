@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SwiftKuerySQLite  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+
+
+    <a title="SwiftKuerySQLite  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          SwiftKuerySQLite Docs
+        </a>
+         (81% documented)
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/IBM-Swift/Swift-Kuery-SQLite">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">SwiftKuerySQLite Reference</a>
+      <img class="carat" src="img/carat.png" />
+      SwiftKuerySQLite  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/SQLiteConnection.html">SQLiteConnection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/SQLiteResultFetcher.html">SQLiteResultFetcher</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums.html#/s:O16SwiftKuerySQLite17ConnectionOptions">ConnectionOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Location.html">Location</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            
+            <a href='#swift-kuery-sqlite' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h1 id='swift-kuery-sqlite'>Swift-Kuery-SQLite</h1>
+
+<p>SQLite plugin for the <a href="https://github.com/IBM-Swift/Swift-Kuery">Swift-Kuery</a> framework.</p>
+
+<p><img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
+<img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
+<img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2"></p>
+<a href='#summary' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='summary'>Summary</h2>
+
+<p><a href="https://sqlite.org/">SQLite</a> plugin for the <a href="https://github.com/IBM-Swift/Swift-Kuery">Swift-Kuery</a> framework. It enables you to use Swift-Kuery to manipulate data in a SQLite database.</p>
+<a href='#sqlite-installation' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='sqlite-installation'>SQLite installation</h2>
+
+<p>To use Swift-Kuery-SQLite you must install SQLite.</p>
+<a href='#macos' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='macos'>macOS</h3>
+<pre class="highlight plaintext"><code>$ brew install sqlite
+</code></pre>
+<a href='#linux' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='linux'>Linux</h3>
+<pre class="highlight plaintext"><code>$ sudo apt-get install sqlite3 libsqlite3-dev
+</code></pre>
+<a href='#using-swift-kuery-sqlite' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='using-swift-kuery-sqlite'>Using Swift-Kuery-SQLite</h2>
+
+<p>First create an instance of <code>Swift-Kuery-SQLite</code> by calling:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">db</span> <span class="o">=</span> <span class="kt">SQLiteConnection</span><span class="p">(</span><span class="nv">filename</span><span class="p">:</span> <span class="s">"myDB.db"</span><span class="p">)</span>
+</code></pre>
+
+<p>To establish a connection call:</p>
+<pre class="highlight swift"><code><span class="n">db</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">onCompletion</span><span class="p">:</span> <span class="p">(</span><span class="kt">QueryError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">())</span>
+</code></pre>
+
+<p>You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the <a href="https://github.com/IBM-Swift/Swift-Kuery">Kuery</a> documentation for more information.</p>
+<a href='#license' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='license'>License</h2>
+
+<p>This library is licensed under Apache 2.0. Full license text is available in <a href="LICENSE.txt">LICENSE</a>.</p>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2016 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2016-12-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

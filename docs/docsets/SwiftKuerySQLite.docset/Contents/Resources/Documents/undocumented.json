@@ -1,0 +1,33 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/ipartrid/Swift-Kuery-SQLite/Sources/SwiftKuerySQLite/ConnectionOptions.swift",
+      "line": 19,
+      "symbol": "ConnectionOptions",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/ipartrid/Swift-Kuery-SQLite/Sources/SwiftKuerySQLite/Location.swift",
+      "line": 23,
+      "symbol": "Location.inMemory",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/ipartrid/Swift-Kuery-SQLite/Sources/SwiftKuerySQLite/Location.swift",
+      "line": 24,
+      "symbol": "Location.temporary",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/ipartrid/Swift-Kuery-SQLite/Sources/SwiftKuerySQLite/Location.swift",
+      "line": 25,
+      "symbol": "Location.uri",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/ipartrid/Swift-Kuery-SQLite"
+}
