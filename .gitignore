@@ -1,6 +1,7 @@
 testDb.db
 Tests/SwiftKuerySQLiteTests/testDb.db
 .DS_Store
+build
 /.build
 /Packages
 /*.xcodeproj
