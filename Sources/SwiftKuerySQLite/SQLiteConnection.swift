@@ -1,5 +1,5 @@
 /**
- Copyright IBM Corporation 2016
+ Copyright IBM Corporation 2016, 2017
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -48,12 +48,13 @@ public class SQLiteConnection: Connection {
     /// - returns: self
     public init(_ location: Location = .inMemory, options: [ConnectionOptions]? = nil) {
         self.location = location
-        self.queryBuilder = QueryBuilder()
+        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false)
         queryBuilder.updateSubstitutions(
             [
              QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
              QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
-             QueryBuilder.QuerySubstitutionNames.len : "LENGTH"])
+             QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
+             QueryBuilder.QuerySubstitutionNames.all : ""])
     }
 
     /// Initialiser with a path to where the DB is stored
@@ -133,6 +134,24 @@ public class SQLiteConnection: Connection {
         executeQuery(query: raw, onCompletion: onCompletion)
     }
 
+    /// Execute a query with parameters.
+    ///
+    /// - Parameter query: The query to execute.
+    /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
+    public func execute(query: Query, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(query: query, onCompletion: onCompletion)
+    }
+    
+    /// Execute a raw query with parameters.
+    ///
+    /// - Parameter query: A String with the query to execute.
+    /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
+    public func execute(_ raw: String, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
+        executeQuery(query: raw, onCompletion: onCompletion)
+    }
+    
     /// Actually executes the query
     ///
     /// - parameter query:        The query
