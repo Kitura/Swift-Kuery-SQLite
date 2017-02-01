@@ -135,6 +135,15 @@ class TestSubquery: XCTestCase {
                                                                     XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                     XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
+                                                                    
+                                                                    s = Select(from: t)
+                                                                        .where(false.notIn(true, true))
+                                                                    executeQueryWithParameters(query: s, connection: connection, parameters: true, true) { result, rows in
+                                                                        XCTAssertEqual(result.success, true, "SELECT failed")
+                                                                        XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                                                        XCTAssertNotNil(rows, "SELECT returned no rows")
+                                                                        XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
+                                                                    }
                                                                 }
                                                             }
                                                         }
