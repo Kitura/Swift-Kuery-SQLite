@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * Copyright IBM Corporation 2016, 2017
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ private func printResultAndGetRowsAsArray(_ result: QueryResult) -> [[Any?]]? {
     if let resultSet = result.asResultSet {
         let titles = resultSet.titles
         for title in titles {
-            print(title.padding(toLength: 11, withPad: " ", startingAt: 0), terminator: "")
+            print(title.padding(toLength: 21, withPad: " ", startingAt: 0), terminator: "")
         }
         print()
         rows = rowsAsArray(resultSet)
@@ -109,9 +109,9 @@ private func printResultAndGetRowsAsArray(_ result: QueryResult) -> [[Any?]]? {
                 for value in row {
                     var valueToPrint = ""
                     if value != nil {
-                        valueToPrint = value as! String
+                        valueToPrint = String(describing: value!)
                     }
-                    print(valueToPrint.padding(toLength: 11, withPad: " ", startingAt: 0), terminator: "")
+                    print(valueToPrint.padding(toLength: 21, withPad: " ", startingAt: 0), terminator: "")
                 }
                 print()
             }

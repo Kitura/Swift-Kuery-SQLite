@@ -1,12 +1,12 @@
 /**
  Copyright IBM Corporation 2016, 2017
-
+ 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
+ 
  http://www.apache.org/licenses/LICENSE-2.0
-
+ 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,55 +23,55 @@ import SwiftKuery
 
 import Foundation
 
+let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+
 /// An implementation of `SwiftKuery.Connection` protocol for SQLite.
 /// Please see [SQLite manual](https://sqlite.org/capi3ref.html) for details.
 public class SQLiteConnection: Connection {
-
+    
     /// Stores all the results of the query
     private struct Result {
         var columnNames: [String] = []
         var results: [[Any]] = [[Any]]()
         var returnedResult: Bool = false
     }
-
+    
     private var connection: OpaquePointer?
     private var location: Location
-
+    
     /// The `QueryBuilder` with SQLite specific substitutions.
     public var queryBuilder: QueryBuilder
-
-    /// Initialiser to create a SwiftKuerySQLite instance
+    
+    /// Initialiser to create a SwiftKuerySQLite instance.
     ///
-    /// - parameter location: Describes where the db is stored
-    /// - parameter options:  not used currently
-    ///
-    /// - returns: self
+    /// - Parameter location: Describes where the database is stored.
+    /// - Parameter options: not used currently
+    /// - Returns: An instance of `SQLiteConnection`.
     public init(_ location: Location = .inMemory, options: [ConnectionOptions]? = nil) {
         self.location = location
         self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false)
         queryBuilder.updateSubstitutions(
             [
-             QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
-             QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
-             QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
-             QueryBuilder.QuerySubstitutionNames.all : "",
-             QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
-             QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
+                QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
+                QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
+                QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
+                QueryBuilder.QuerySubstitutionNames.all : "",
+                QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
+                QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
     }
-
-    /// Initialiser with a path to where the DB is stored
+    
+    /// Initialiser with a path to where the database is stored.
     ///
-    /// - parameter filename: The path where the DB is stored
-    /// - parameter options:  not used currently
-    ///
-    /// - returns: self
+    /// - Parameter filename: The path where the database is stored.
+    /// - Pparameter options: not used currently.
+    /// - Returns: An instance of `SQLiteConnection`.
     public convenience init(filename: String, options: [ConnectionOptions]? = nil) {
         self.init(.uri(filename), options: options)
     }
-
-    /// Connects to the DB
+    
+    /// Establish a connection with the database.
     ///
-    /// - parameter onCompletion: callback returning an error or a nil if successful
+    /// - Parameter onCompletion: The function to be called when the connection is established.
     public func connect(onCompletion: (QueryError?) -> ()) {
         let resultCode = sqlite3_open(location.description, &connection)
         var queryError: QueryError? = nil
@@ -81,68 +81,60 @@ public class SQLiteConnection: Connection {
         }
         onCompletion(queryError)
     }
-
+    
     public func descriptionOf(query: Query) throws -> String {
         return try query.build(queryBuilder: queryBuilder)
     }
-
-    /// Close the connection to the DB
+    
+    /// Close the connection to the database.
     public func closeConnection() {
         if let connection = connection {
             sqlite3_close(connection)
             self.connection = nil
         }
     }
-
-    /// Executes a query.
+    
+    /// Execute a query.
     ///
-    /// - parameter query:        The query to execute
-    /// - parameter onCompletion: The result
+    /// - Parameter query: The query to execute.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, onCompletion: @escaping ((QueryResult) -> ())) {
-        do {
-            let sqliteQuery = try query.build(queryBuilder: queryBuilder)
-            executeQuery(query: sqliteQuery, onCompletion: onCompletion)
-        }
-        catch QueryError.syntaxError(let error) {
-            onCompletion(.error(QueryError.syntaxError(error)))
-        }
-        catch {
-            onCompletion(.error(QueryError.syntaxError("Failed to build the query")))
-        }
+        execute(query: query, parameters: [Any](), namedParameters: [String:Any](), onCompletion: onCompletion)
     }
-
-    /// Executes a raw query.
+    
+    /// Execute a raw query.
     ///
-    /// - parameter raw:          The full raw query to execute
-    /// - parameter onCompletion: The result
+    /// - Parameter query: A String with the query to execute.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        executeQuery(query: raw, onCompletion: onCompletion)
+        execute(sqliteQuery: raw, parameters: [Any](), namedParameters: [String:Any](), onCompletion: onCompletion)
     }
-
+    
     /// Execute a query with parameters.
     ///
     /// - Parameter query: The query to execute.
     /// - Parameter parameters: An array of the parameters.
-    /// - Parameter onCompletion: The function to be called once the execution of the query is completed.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, parameters: [Any], onCompletion: (@escaping (QueryResult) -> ())) {
-        execute(query: query, onCompletion: onCompletion)
+        execute(query: query, parameters: parameters, namedParameters: [String:Any](), onCompletion: onCompletion)
     }
-
-    /// Executes a raw query with parameters.
+    
+    /// Execute a raw query with parameters.
     ///
-    /// - parameter raw:          The full raw query to execute
-    /// - parameter onCompletion: The result
+    /// - Parameter query: A String with the query to execute.
+    /// - Parameter parameters: An array of the parameters.
+    /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, parameters: [Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        executeQuery(query: raw, onCompletion: onCompletion)
+        execute(sqliteQuery: raw, parameters: parameters, namedParameters: [String:Any](), onCompletion: onCompletion)
     }
-
+    
     /// Execute a query with parameters.
     ///
     /// - Parameter query: The query to execute.
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(query: query, onCompletion: onCompletion)
+        execute(query: query, parameters: [Any](), namedParameters: parameters, onCompletion: onCompletion)
     }
     
     /// Execute a raw query with parameters.
@@ -151,56 +143,138 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        executeQuery(query: raw, onCompletion: onCompletion)
+        execute(sqliteQuery: raw, parameters: [Any](), namedParameters: parameters, onCompletion: onCompletion)
+    }
+
+    private func execute(query: Query, parameters: [Any], namedParameters: [String:Any], onCompletion: (@escaping (QueryResult) -> ())) {
+        do {
+            let sqliteQuery = try query.build(queryBuilder: queryBuilder)
+            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+        }
+        catch QueryError.syntaxError(let error) {
+            onCompletion(.error(QueryError.syntaxError(error)))
+        }
+        catch {
+            onCompletion(.error(QueryError.syntaxError("Failed to build the query")))
+        }
     }
     
-    /// Actually executes the query
-    ///
-    /// - parameter query:        The query
-    /// - parameter onCompletion: The result
-    private func executeQuery(query: String, onCompletion: @escaping ((QueryResult) -> ())) {
-
-        var errmsg: UnsafeMutablePointer<Int8>?
-        var result = Result()
-
-        // This is where we bridge to the C code
-        // - connection:     the OpaquePointer to the DB
-        // - query:          the query to execute
-        // - callback:       if there are any results to be returned this will run otherwise it will skip
-        //                   calling the callback
-        // - result:         stores the result of the callback, if there are any
-        // - errmsg:         the error message if something goes wrong
-        let resultCode = sqlite3_exec(connection, query, {
-            (result, cols, colText, colName) -> Int32 in
-                let values = result?.assumingMemoryBound(to: Result.self)
-                let numCols = Int(cols)
-
-                if (values?.pointee.columnNames.count)! < numCols {
-                    for j in 0..<numCols {
-                        values?.pointee.columnNames.append(String(cString: (colName?[j])!))
+    private func bind(parameter: Any, at index: Int32, statement: OpaquePointer) -> String? {
+        var result: Int32
+        switch parameter {
+        case let value as String:
+            result = sqlite3_bind_text(statement, Int32(index), value, -1, SQLITE_TRANSIENT)
+        case let value as Float:
+            result = sqlite3_bind_double(statement, Int32(index), Double(value))
+        case let value as Double:
+            result = sqlite3_bind_double(statement, Int32(index), value)
+        case let value as Int:
+            result = sqlite3_bind_int64(statement, Int32(index), Int64(value))
+        case let value as Data:
+            result = sqlite3_bind_blob(statement, Int32(index), [UInt8](value), Int32(value.count), SQLITE_TRANSIENT)
+        default:
+            return "Unsupported parameter type"
+        }
+        guard result == SQLITE_OK else {
+            return "Failed to bind query parameter"
+        }
+            return nil
+    }
+    
+    private func execute(sqliteQuery: String, parameters: [Any], namedParameters: [String:Any], onCompletion: (@escaping (QueryResult) -> ())) {
+        do {
+            var sqliteStatement: OpaquePointer?
+            var sqlTail: UnsafePointer<Int8>? = nil
+            
+            // Prepare SQLite statement
+            guard sqlite3_prepare_v2(connection, sqliteQuery, -1, &sqliteStatement, &sqlTail) == SQLITE_OK else {
+                onCompletion(.error(QueryError.databaseError("Failed to prepare the query statement")))
+                return
+            }
+            
+            // Bind parameters: either numbered parameters or named parameters can be passed,
+            // mixing of both types of parameters in one query is not supported
+            
+            // Numbered parameters
+            for (i, parameter) in parameters.enumerated() {
+                if let error = bind(parameter: parameter, at: i+1, statement: sqliteStatement!) {
+                    onCompletion(.error(QueryError.databaseError(error)))
+                    return
+                }
+            }
+            
+            // Named parameters
+            for (name, parameter) in namedParameters {
+                let index = sqlite3_bind_parameter_index(sqliteStatement, name)
+                if let error = bind(parameter: parameter, at: index, statement: sqliteStatement!) {
+                    onCompletion(.error(QueryError.databaseError(error)))
+                    return
+                }
+            }
+            
+            let numberOfColumns = sqlite3_column_count(sqliteStatement)
+            var finished = false
+            var rows = [[Any?]]()
+            
+            // Get titles
+            var titles = [String]()
+            for i in 0..<numberOfColumns {
+                if let title = sqlite3_column_name(sqliteStatement, Int32(i)) {
+                    titles.append(String(cString: title))
+                }
+            }
+            
+            // Execute and get result
+            // TODO: Handle SQLITE_BUSY
+            while !finished {
+                let result = sqlite3_step(sqliteStatement)
+                switch result {
+                case SQLITE_DONE:
+                    finished = true
+                    sqlite3_reset(sqliteStatement)
+                case SQLITE_ROW:                    
+                    var row = [Any?]()
+                    for i in 0..<numberOfColumns {
+                        var value: Any?
+                        switch sqlite3_column_type(sqliteStatement, i) {
+                        case SQLITE_INTEGER:
+                            value = sqlite3_column_int(sqliteStatement, i)
+                        case SQLITE_FLOAT:
+                            value = sqlite3_column_double(sqliteStatement, i)
+                        case SQLITE_TEXT:
+                            value = String(cString: sqlite3_column_text(sqliteStatement, i))
+                        case SQLITE_BLOB:
+                            let count = sqlite3_column_bytes(sqliteStatement, i)
+                            if let bytes = sqlite3_column_blob(sqliteStatement, i) {
+                                value = Data(bytes: bytes, count: Int(count))
+                            }
+                            else {
+                                value = nil
+                            }
+                        case SQLITE_NULL:
+                            value = nil
+                        default:
+                            value = nil
+                        }
+                        row.append(value)
                     }
+                    rows.append(row)
+                    
+               default:
+                    sqlite3_finalize(sqliteStatement)
+                    onCompletion(.error(QueryError.databaseError("Failed to execute the query")))
+                    return
                 }
-
-                var singleRow = [Any]()
-                for i in 0..<numCols {
-                    singleRow.append(String(cString: (colText?[i])!))
-                }
-
-                values?.pointee.results.append(singleRow)
-                values?.pointee.returnedResult = true
-
-                // Must return 0 for a successful execute
-                return 0
-            }, &result, &errmsg)
-
-        if resultCode == SQLITE_OK {
-            if result.returnedResult {
-                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(titles: result.columnNames, rows: result.results))))
-            } else {
+            }
+            
+            sqlite3_finalize(sqliteStatement)
+            
+            if rows.count > 0 {
+                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(titles: titles, rows: rows))))
+            }
+            else {
                 onCompletion(.successNoData)
             }
-        } else if let errmsg = errmsg {
-            onCompletion(.error(QueryError.databaseError(String(cString: errmsg))))
         }
     }
 }
