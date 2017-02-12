@@ -1,0 +1,31 @@
+# Travis CI build file for Swift-Kuery-SQLite.
+# Swift-Kuery-SQLite runs on OS X and Linux (Ubuntu).
+# See the following URLs for further details on Travis CI
+# https://docs.travis-ci.com/user/customizing-the-build/
+# https://docs.travis-ci.com/user/docker/
+# https://docs.travis-ci.com/user/multi-os/
+
+# whitelist (branches that should be built)
+branches:
+  only:
+    - master
+    - /^issue.*$/
+
+notifications:
+  slack:
+    secure: "Gx3bb+yth07JaMeqY89W85gBlbYAkcUEzP6xo6ynG4SZY/zUgOChFZME0J/7w6TLMvDVwLhfsH71XjSDVhTAyq6zrvOmW80aRlNrr4CxqrvXFfOJhMea64zyo4fZC1BQnmTS5GL1OTtmr/gsQf/8Zad5efj59lgaKKjeFsUOFbPWQRC5IuFSpiOrAiE8CaU3GdOopPre+8cMX8OlLz3s44zFIP0/LDLXnkBHzBfcxgJoo4rTfGIHEcuxQog9iK6CiZAMT95bOSZwFSS+C0wCBC9/rVhGB9ca90NoOg87wdA0a5xCbLwBQ2OXeUKrbnGAsHrohR7qUq/vMaVG5yTe2SBbVC4BJpaXnXxKPoIZSCUlQszRRK4a1xmsS1rISAuFCvHf3BQ1ha6qhlLOuiLNFHMi0clVDgEroYXPI+0vxpj5tWvZC2AndaY6N5kXCsAx7l1YVgb9q6A1zrXQNLBerZWYzDf7EWeD23Tx7XXEvs6T1xy/GVU9oD2UNzDaQTvCAzWrGbrSV8kevpDizQwyYVkRp/BtypLfMqAKCw/Vh4DoQ/KHauGKB6ejm9NxBmvOoqoYxYCDYkJDpPGTM0kzbMAR6v3zQLKOdBDcIsTSIcLeBcMXOwYG6GlD9uu7+RUxp6qKGk1kImFOCRP6qOZdIYRoylFuABLW84ZGynrUU6w="
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+      osx_image: xcode8.2
+      sudo: required
+
+before_install:
+  - git clone https://github.com/IBM-Swift/Package-Builder.git
+
+script:
+  - ./Package-Builder/build-package.sh -projectDir $TRAVIS_BUILD_DIR
