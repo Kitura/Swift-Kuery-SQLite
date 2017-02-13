@@ -20,7 +20,7 @@
         <a class="header-link" href="../index.html">
           SwiftKuerySQLite Docs
         </a>
-         (81% documented)
+         (100% documented)
       </p>
     
         <p class="header-col header-col--secondary">
@@ -126,7 +126,25 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Initialiser to create a SwiftKuerySQLite instance</p>
+                        <p>Initialiser to create a SwiftKuerySQLite instance.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter location: Describes where the database is stored.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter options: not used currently
+
+</div>
+
+<div class="aside aside-returns">
+    <p class="aside-title">Returns</p>
+    An instance of <code>SQLiteConnection</code>.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -149,7 +167,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>Describes where the db is stored</p>
+                                  <p>Describes where the database is stored.</p>
 
                                 </div>
                               </td>
@@ -172,7 +190,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>self</p>
+                        <p>An instance of <code>SQLiteConnection</code>.</p>
 
                       </div>
                     </section>
@@ -191,7 +209,20 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Initialiser with a path to where the DB is stored</p>
+                        <p>Initialiser with a path to where the database is stored.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter filename: The path where the database is stored.
+
+</div>
+
+<p><li>Pparameter options: not used currently.</li>
+<div class="aside aside-returns">
+    <p class="aside-title">Returns</p>
+    An instance of <code>SQLiteConnection</code>.</p>
+
+<p></div></p>
 
                       </div>
                       <div class="declaration">
@@ -214,20 +245,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The path where the DB is stored</p>
-
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>options</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>not used currently</p>
+                                  <p>The path where the database is stored.</p>
 
                                 </div>
                               </td>
@@ -237,7 +255,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>self</p>
+                        <p>An instance of <code>SQLiteConnection</code>.</p>
 
                       </div>
                     </section>
@@ -256,7 +274,13 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Connects to the DB</p>
+                        <p>Establish a connection with the database.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the connection is established.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -279,7 +303,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>callback returning an error or a nil if successful</p>
+                                  <p>The function to be called when the connection is established.</p>
 
                                 </div>
                               </td>
@@ -303,8 +327,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Connects to the DB</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -355,7 +378,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Close the connection to the DB</p>
+                        <p>Close the connection to the database.</p>
 
                       </div>
                       <div class="declaration">
@@ -382,7 +405,19 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Executes a query.</p>
+                        <p>Execute a query.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: The query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -405,7 +440,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The query to execute</p>
+                                  <p>The query to execute.</p>
 
                                 </div>
                               </td>
@@ -418,7 +453,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The result</p>
+                                  <p>The function to be called when the execution of the query has completed.</p>
 
                                 </div>
                               </td>
@@ -442,7 +477,19 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Executes a raw query.</p>
+                        <p>Execute a raw query.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: A String with the query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -460,12 +507,12 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                             <tr>
                               <td>
                                 <code>
-                                <em>raw</em>
+                                <em>query</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>The full raw query to execute</p>
+                                  <p>A String with the query to execute.</p>
 
                                 </div>
                               </td>
@@ -478,7 +525,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The result</p>
+                                  <p>The function to be called when the execution of the query has completed.</p>
 
                                 </div>
                               </td>
@@ -518,7 +565,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
 
 <div class="aside aside-parameter">
     <p class="aside-title">Parameter</p>
-    Parameter onCompletion: The function to be called once the execution of the query is completed.
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
 
 </div>
 
@@ -569,7 +616,7 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The function to be called once the execution of the query is completed.</p>
+                                  <p>The function to be called when the execution of the query has completed.</p>
 
                                 </div>
                               </td>
@@ -593,7 +640,25 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Executes a raw query with parameters.</p>
+                        <p>Execute a raw query with parameters.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: A String with the query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter parameters: An array of the parameters.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -611,12 +676,25 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                             <tr>
                               <td>
                                 <code>
-                                <em>raw</em>
+                                <em>query</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>The full raw query to execute</p>
+                                  <p>A String with the query to execute.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>parameters</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An array of the parameters.</p>
 
                                 </div>
                               </td>
@@ -629,7 +707,189 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
                               </td>
                               <td>
                                 <div>
-                                  <p>The result</p>
+                                  <p>The function to be called when the execution of the query has completed.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_10parametersGVs10DictionarySSP__12onCompletionFOS1_11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(query:parameters:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFT5queryP10SwiftKuery5Query_10parametersGVs10DictionarySSP__12onCompletionFOS1_11QueryResultT__T_">execute(query:parameters:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Execute a query with parameters.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: The query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter parameters: A dictionary of the parameters with parameter names as the keys.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span><span class="kt">Any</span><span class="p">],</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">((</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The query to execute.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>parameters</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary of the parameters with parameter names as the keys.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The function to be called when the execution of the query has completed.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS10parametersGVs10DictionarySSP__12onCompletionFO10SwiftKuery11QueryResultT__T_"></a>
+                    <a name="//apple_ref/swift/Method/execute(_:parameters:onCompletion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC16SwiftKuerySQLite16SQLiteConnection7executeFTSS10parametersGVs10DictionarySSP__12onCompletionFO10SwiftKuery11QueryResultT__T_">execute(_:parameters:onCompletion:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Execute a raw query with parameters.</p>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter query: A String with the query to execute.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter parameters: A dictionary of the parameters with parameter names as the keys.
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    Parameter onCompletion: The function to be called when the execution of the query has completed.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="n">_</span> <span class="nv">raw</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span><span class="kt">Any</span><span class="p">],</span> <span class="nv">onCompletion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">((</span><span class="kt">QueryResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A String with the query to execute.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>parameters</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary of the parameters with parameter names as the keys.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onCompletion</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The function to be called when the execution of the query has completed.</p>
 
                                 </div>
                               </td>
@@ -648,8 +908,8 @@ Please see <a href="https://sqlite.org/capi3ref.html">SQLite manual</a> for deta
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2016 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2016-12-13)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-02-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.0</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

@@ -1,12 +1,13 @@
 # Swift-Kuery-SQLite
 SQLite plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework.
 
+[![Build Status - Master](https://travis-ci.org/IBM-Swift/Kitura.svg?branch=master)](https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
 ![Apache 2](https://img.shields.io/badge/license-Apache2-blue.svg?style=flat)
 
 ## Summary
-[SQLite](https://sqlite.org/) plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework. It enables you to use Swift-Kuery to manipulate data in a SQLite database.
+[SQLite](https://sqlite.org/) plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.
 
 ## SQLite installation
 

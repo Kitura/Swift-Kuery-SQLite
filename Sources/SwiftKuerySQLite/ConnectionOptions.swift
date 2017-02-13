@@ -12,8 +12,11 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- */
+*/
 
 // Currently connection options aren't implemented e.g readonly and other flags (https://sqlite.org/c3ref/open.html) for opening the DB
 
+// MARK: ConnectionOptions
+
+/// Configuration options to be passed to SQLite. Currently not implemented.
 public enum ConnectionOptions {}

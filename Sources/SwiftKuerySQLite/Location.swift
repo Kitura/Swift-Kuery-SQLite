@@ -12,20 +12,24 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- */
+*/
 
-/// Describes where the location of the DB is stored
-///
-/// - inMemory:  This will be in memory and when the connection closes, the DB will vanish
-/// - temporary: Will be a temporary on-disk DB, when the connection closes, it will be automatically deleted
-/// - uri:       Where the DB stored
+// MARK: Location
+
+/// Location of the database.
 public enum Location {
+    /// In memory database, when the connection closes, the database will vanish.
     case inMemory
+    
+    /// A temporary on-disk database, when the connection closes, it will be automatically deleted.
     case temporary
+    
+    /// The URI where the database is stored.
     case uri(String)
 }
 
 extension Location: CustomStringConvertible {
+    /// The textual representation of `Location`.
     public var description: String {
         switch self {
         case .inMemory:
