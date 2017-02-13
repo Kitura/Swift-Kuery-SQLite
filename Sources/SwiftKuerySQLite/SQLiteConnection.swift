@@ -79,6 +79,10 @@ public class SQLiteConnection: Connection {
             let error: String? = String(validatingUTF8: sqlite3_errmsg(connection))
             queryError = QueryError.connection(error!)
         }
+        else {
+            // Set the busy timeout to 200 milliseconds.
+            sqlite3_busy_timeout(connection, 200)
+        }
         onCompletion(queryError)
     }
     
