@@ -212,68 +212,19 @@ public class SQLiteConnection: Connection {
                 }
             }
             
-            let numberOfColumns = sqlite3_column_count(sqliteStatement)
-            var finished = false
-            var rows = [[Any?]]()
-            
-            // Get titles
-            var titles = [String]()
-            for i in 0..<numberOfColumns {
-                if let title = sqlite3_column_name(sqliteStatement, Int32(i)) {
-                    titles.append(String(cString: title))
-                }
-            }
-            
             // Execute and get result
             // TODO: Handle SQLITE_BUSY
-            while !finished {
-                let result = sqlite3_step(sqliteStatement)
-                switch result {
-                case SQLITE_DONE:
-                    finished = true
-                    sqlite3_reset(sqliteStatement)
-                case SQLITE_ROW:                    
-                    var row = [Any?]()
-                    for i in 0..<numberOfColumns {
-                        var value: Any?
-                        switch sqlite3_column_type(sqliteStatement, i) {
-                        case SQLITE_INTEGER:
-                            value = sqlite3_column_int(sqliteStatement, i)
-                        case SQLITE_FLOAT:
-                            value = sqlite3_column_double(sqliteStatement, i)
-                        case SQLITE_TEXT:
-                            value = String(cString: sqlite3_column_text(sqliteStatement, i))
-                        case SQLITE_BLOB:
-                            let count = sqlite3_column_bytes(sqliteStatement, i)
-                            if let bytes = sqlite3_column_blob(sqliteStatement, i) {
-                                value = Data(bytes: bytes, count: Int(count))
-                            }
-                            else {
-                                value = nil
-                            }
-                        case SQLITE_NULL:
-                            value = nil
-                        default:
-                            value = nil
-                        }
-                        row.append(value)
-                    }
-                    rows.append(row)
-                    
-               default:
-                    sqlite3_finalize(sqliteStatement)
-                    onCompletion(.error(QueryError.databaseError("Failed to execute the query")))
-                    return
-                }
-            }
-            
-            sqlite3_finalize(sqliteStatement)
-            
-            if rows.count > 0 {
-                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(titles: titles, rows: rows))))
-            }
-            else {
+            let result = sqlite3_step(sqliteStatement)
+            switch result {
+            case SQLITE_DONE:
+                sqlite3_finalize(sqliteStatement)
                 onCompletion(.successNoData)
+            case SQLITE_ROW:
+                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement!))))
+            default:
+                let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement!))
+                sqlite3_finalize(sqliteStatement)
+                onCompletion(.error(QueryError.databaseError("Failed to execute the query. Error: \(error)")))
             }
         }
     }
