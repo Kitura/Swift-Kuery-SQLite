@@ -45,9 +45,8 @@ public class SQLiteConnection: Connection {
     /// Initialiser to create a SwiftKuerySQLite instance.
     ///
     /// - Parameter location: Describes where the database is stored.
-    /// - Parameter options: not used currently
     /// - Returns: An instance of `SQLiteConnection`.
-    public init(_ location: Location = .inMemory, options: [ConnectionOptions]? = nil) {
+    public init(_ location: Location = .inMemory) {
         self.location = location
         self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false)
         queryBuilder.updateSubstitutions(
@@ -63,10 +62,13 @@ public class SQLiteConnection: Connection {
     /// Initialiser with a path to where the database is stored.
     ///
     /// - Parameter filename: The path where the database is stored.
-    /// - Pparameter options: not used currently.
     /// - Returns: An instance of `SQLiteConnection`.
-    public convenience init(filename: String, options: [ConnectionOptions]? = nil) {
-        self.init(.uri(filename), options: options)
+    public convenience init(filename: String) {
+        self.init(.uri(filename))
+    }
+    
+    deinit {
+        closeConnection()
     }
     
     /// Establish a connection with the database.
@@ -86,6 +88,11 @@ public class SQLiteConnection: Connection {
         onCompletion(queryError)
     }
     
+    /// Return a String representation of the query.
+    ///
+    /// - Parameter query: The query.
+    /// - Returns: A String representation of the query.
+    /// - Throws: QueryError.syntaxError if query build fails.
     public func descriptionOf(query: Query) throws -> String {
         return try query.build(queryBuilder: queryBuilder)
     }
@@ -163,36 +170,15 @@ public class SQLiteConnection: Connection {
         }
     }
     
-    private func bind(parameter: Any, at index: Int32, statement: OpaquePointer) -> String? {
-        var result: Int32
-        switch parameter {
-        case let value as String:
-            result = sqlite3_bind_text(statement, Int32(index), value, -1, SQLITE_TRANSIENT)
-        case let value as Float:
-            result = sqlite3_bind_double(statement, Int32(index), Double(value))
-        case let value as Double:
-            result = sqlite3_bind_double(statement, Int32(index), value)
-        case let value as Int:
-            result = sqlite3_bind_int64(statement, Int32(index), Int64(value))
-        case let value as Data:
-            result = sqlite3_bind_blob(statement, Int32(index), [UInt8](value), Int32(value.count), SQLITE_TRANSIENT)
-        default:
-            return "Unsupported parameter type"
-        }
-        guard result == SQLITE_OK else {
-            return "Failed to bind query parameter"
-        }
-            return nil
-    }
-    
     private func execute(sqliteQuery: String, parameters: [Any], namedParameters: [String:Any], onCompletion: (@escaping (QueryResult) -> ())) {
         do {
             var sqliteStatement: OpaquePointer?
             var sqlTail: UnsafePointer<Int8>? = nil
             
             // Prepare SQLite statement
-            guard sqlite3_prepare_v2(connection, sqliteQuery, -1, &sqliteStatement, &sqlTail) == SQLITE_OK else {
-                onCompletion(.error(QueryError.databaseError("Failed to prepare the query statement")))
+            var resultCode = sqlite3_prepare_v2(connection, sqliteQuery, -1, &sqliteStatement, &sqlTail)
+            guard resultCode == SQLITE_OK else {
+                onCompletion(.error(createError("Failed to prepare the query statement.", errorCode: resultCode)))
                 return
             }
             
@@ -202,7 +188,8 @@ public class SQLiteConnection: Connection {
             // Numbered parameters
             for (i, parameter) in parameters.enumerated() {
                 if let error = bind(parameter: parameter, at: i+1, statement: sqliteStatement!) {
-                    onCompletion(.error(QueryError.databaseError(error)))
+                    sqlite3_finalize(sqliteStatement)
+                    onCompletion(.error(error))
                     return
                 }
             }
@@ -211,15 +198,15 @@ public class SQLiteConnection: Connection {
             for (name, parameter) in namedParameters {
                 let index = sqlite3_bind_parameter_index(sqliteStatement, name)
                 if let error = bind(parameter: parameter, at: index, statement: sqliteStatement!) {
-                    onCompletion(.error(QueryError.databaseError(error)))
+                    sqlite3_finalize(sqliteStatement)
+                    onCompletion(.error(error))
                     return
                 }
             }
             
             // Execute and get result
-            // TODO: Handle SQLITE_BUSY
-            let result = sqlite3_step(sqliteStatement)
-            switch result {
+            resultCode = sqlite3_step(sqliteStatement)
+            switch resultCode {
             case SQLITE_DONE:
                 sqlite3_finalize(sqliteStatement)
                 onCompletion(.successNoData)
@@ -231,5 +218,32 @@ public class SQLiteConnection: Connection {
                 onCompletion(.error(QueryError.databaseError("Failed to execute the query. Error: \(error)")))
             }
         }
+    }
+    
+    private func bind(parameter: Any, at index: Int32, statement: OpaquePointer) -> QueryError? {
+        var resultCode: Int32
+        switch parameter {
+        case let value as String:
+            resultCode = sqlite3_bind_text(statement, Int32(index), value, -1, SQLITE_TRANSIENT)
+        case let value as Float:
+            resultCode = sqlite3_bind_double(statement, Int32(index), Double(value))
+        case let value as Double:
+            resultCode = sqlite3_bind_double(statement, Int32(index), value)
+        case let value as Int:
+            resultCode = sqlite3_bind_int64(statement, Int32(index), Int64(value))
+        case let value as Data:
+            resultCode = sqlite3_bind_blob(statement, Int32(index), [UInt8](value), Int32(value.count), SQLITE_TRANSIENT)
+        default:
+            return createError("Unsupported parameter type")
+        }
+        return (resultCode == SQLITE_OK) ? nil : createError("Failed to bind query parameter.", errorCode: resultCode)
+    }
+    
+    private func createError(_ error: String, errorCode: Int32?=nil) -> QueryError {
+        var errorMessage = error
+        if let errorCode = errorCode, let sqliteError = String(validatingUTF8: sqlite3_errstr(errorCode)) {
+            errorMessage += " SQLite error: " + sqliteError
+        }
+        return QueryError.databaseError(errorMessage)
     }
 }

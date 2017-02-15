@@ -28,7 +28,7 @@ import Foundation
 public class SQLiteResultFetcher: ResultFetcher {
     
     private let titles: [String]
-    private var row: [Any?]?
+    private var firstRow: [Any?]?
     private let sqliteStatement: OpaquePointer
     private let numberOfColumns: Int32
     private var hasMoreRows = true
@@ -44,16 +44,22 @@ public class SQLiteResultFetcher: ResultFetcher {
         titles = columnNames
         
         self.sqliteStatement = sqliteStatement
-        row = buildRow()
+        firstRow = buildRow()
+    }
+    
+    deinit {
+        if hasMoreRows {
+            sqlite3_finalize(sqliteStatement)
+        }
     }
     
     /// Fetch the next row of the query result. This function is blocking.
     ///
     /// - Returns: An array of values of type Any? representing the next row from the query result.
     public func fetchNext() -> [Any?]? {
-        if let fetchedRow = row {
-            row = nil
-            return fetchedRow
+        if let row = firstRow {
+            firstRow = nil
+            return row
         }
         guard hasMoreRows else {
             return nil
