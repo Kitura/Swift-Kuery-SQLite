@@ -86,6 +86,8 @@ class TestWith: XCTestCase {
             connection.connect() { error in
                 XCTAssertNil(error, "Error connecting to PostgreSQL server: \(error)")
                 
+                executeRawQuery("select sqlite_version()", connection: connection) { result in
+                
                 cleanUp(table: t1.tableName, connection: connection) { result in
                     
                     cleanUp(table: t2.tableName, connection: connection) { result in
@@ -183,6 +185,7 @@ class TestWith: XCTestCase {
                             }
                         }
                     }
+                }
                 }
             }
             expectation.fulfill()
