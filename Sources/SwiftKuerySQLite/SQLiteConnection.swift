@@ -266,7 +266,7 @@ public class SQLiteConnection: Connection {
     ///
     /// - Parameter onCompletion: The function to be called when the execution of rolback transaction command has completed.
     public func rollback(onCompletion: @escaping ((QueryResult) -> ())) {
-        executeTransaction(command: "ROLLBACK", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
+        executeTransaction(command: "ROLLBACK", inTransaction: true, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
     }
     
     /// Create a savepoint.
