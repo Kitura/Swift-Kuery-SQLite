@@ -29,3 +29,10 @@ before_install:
 
 script:
   - ./Package-Builder/build-package.sh -projectDir $TRAVIS_BUILD_DIR
+
+addons:
+  apt:
+    sources:
+      - travis-ci/sqlite3
+    packages:
+      - sqlite3
