@@ -111,7 +111,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: The query to execute.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(query: query, parameters: [Any](), namedParameters: [String:Any](), onCompletion: onCompletion)
+        execute(query: query, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
     
     /// Execute a raw query.
@@ -119,7 +119,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: A String with the query to execute.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(sqliteQuery: raw, parameters: [Any](), namedParameters: [String:Any](), onCompletion: onCompletion)
+        execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
     
     /// Execute a query with parameters.
@@ -127,8 +127,8 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: The query to execute.
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
-    public func execute(query: Query, parameters: [Any], onCompletion: (@escaping (QueryResult) -> ())) {
-        execute(query: query, parameters: parameters, namedParameters: [String:Any](), onCompletion: onCompletion)
+    public func execute(query: Query, parameters: [Any?], onCompletion: (@escaping (QueryResult) -> ())) {
+        execute(query: query, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
     
     /// Execute a raw query with parameters.
@@ -136,8 +136,8 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: A String with the query to execute.
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
-    public func execute(_ raw: String, parameters: [Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(sqliteQuery: raw, parameters: parameters, namedParameters: [String:Any](), onCompletion: onCompletion)
+    public func execute(_ raw: String, parameters: [Any?], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(sqliteQuery: raw, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
     
     /// Execute a query with parameters.
@@ -145,8 +145,8 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: The query to execute.
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
-    public func execute(query: Query, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(query: query, parameters: [Any](), namedParameters: parameters, onCompletion: onCompletion)
+    public func execute(query: Query, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(query: query, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
     }
     
     /// Execute a raw query with parameters.
@@ -154,11 +154,11 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: A String with the query to execute.
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
-    public func execute(_ raw: String, parameters: [String:Any], onCompletion: @escaping ((QueryResult) -> ())) {
-        execute(sqliteQuery: raw, parameters: [Any](), namedParameters: parameters, onCompletion: onCompletion)
+    public func execute(_ raw: String, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
     }
 
-    private func execute(query: Query, parameters: [Any], namedParameters: [String:Any], onCompletion: (@escaping (QueryResult) -> ())) {
+    private func execute(query: Query, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
         do {
             let sqliteQuery = try query.build(queryBuilder: queryBuilder)
             execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
@@ -171,7 +171,7 @@ public class SQLiteConnection: Connection {
         }
     }
     
-    private func execute(sqliteQuery: String, parameters: [Any], namedParameters: [String:Any], onCompletion: (@escaping (QueryResult) -> ())) {
+    private func execute(sqliteQuery: String, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
         do {
             var sqliteStatement: OpaquePointer?
             var sqlTail: UnsafePointer<Int8>? = nil
@@ -221,21 +221,26 @@ public class SQLiteConnection: Connection {
         }
     }
     
-    private func bind(parameter: Any, at index: Int32, statement: OpaquePointer) -> QueryError? {
+    private func bind(parameter: Any?, at index: Int32, statement: OpaquePointer) -> QueryError? {
         var resultCode: Int32
-        switch parameter {
-        case let value as String:
-            resultCode = sqlite3_bind_text(statement, Int32(index), value, -1, SQLITE_TRANSIENT)
-        case let value as Float:
-            resultCode = sqlite3_bind_double(statement, Int32(index), Double(value))
-        case let value as Double:
-            resultCode = sqlite3_bind_double(statement, Int32(index), value)
-        case let value as Int:
-            resultCode = sqlite3_bind_int64(statement, Int32(index), Int64(value))
-        case let value as Data:
-            resultCode = sqlite3_bind_blob(statement, Int32(index), [UInt8](value), Int32(value.count), SQLITE_TRANSIENT)
-        default:
-            return createError("Unsupported parameter type")
+        if parameter == nil {
+           resultCode = sqlite3_bind_null(statement, index)
+        }
+        else {
+            switch parameter {
+            case let value as String:
+                resultCode = sqlite3_bind_text(statement, index, value, -1, SQLITE_TRANSIENT)
+            case let value as Float:
+                resultCode = sqlite3_bind_double(statement, index, Double(value))
+            case let value as Double:
+                resultCode = sqlite3_bind_double(statement, index, value)
+            case let value as Int:
+                resultCode = sqlite3_bind_int64(statement, index, Int64(value))
+            case let value as Data:
+                resultCode = sqlite3_bind_blob(statement, index, [UInt8](value), Int32(value.count), SQLITE_TRANSIENT)
+            default:
+                return createError("Unsupported parameter type")
+            }
         }
         return (resultCode == SQLITE_OK) ? nil : createError("Failed to bind query parameter.", errorCode: resultCode)
     }
