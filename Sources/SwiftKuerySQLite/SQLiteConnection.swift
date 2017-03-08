@@ -55,6 +55,7 @@ public class SQLiteConnection: Connection {
                 QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
                 QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
                 QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
+                QueryBuilder.QuerySubstitutionNames.now : "'now'",
                 QueryBuilder.QuerySubstitutionNames.all : "",
                 QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
                 QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
