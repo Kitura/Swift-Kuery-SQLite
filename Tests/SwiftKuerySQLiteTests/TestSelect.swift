@@ -17,6 +17,8 @@
 import XCTest
 import SwiftKuery
 
+import Foundation
+
 @testable import SwiftKuerySQLite
 
 #if os(Linux)
