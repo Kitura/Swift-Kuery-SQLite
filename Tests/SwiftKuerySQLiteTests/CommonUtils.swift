@@ -142,5 +142,17 @@ func createConnection() -> SQLiteConnection {
 }
 
 
-// Dummy class for test framework
-class CommonUtils { }
+class CommonUtils {
+    private var pool: ConnectionPool?
+    static let sharedInstance = CommonUtils()
+    private init() {}
+    
+    func getConnectionPool() -> ConnectionPool {
+        if let pool = pool {
+            return pool
+        }
+        
+        pool = SQLiteConnection.createPool(filename: "testDb.db", poolOptions: ConnectionPoolOptions(initialCapacity: 20, maxCapacity: 50, timeout: 10000))
+        return pool!
+    }
+}

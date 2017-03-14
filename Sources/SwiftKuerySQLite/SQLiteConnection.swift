@@ -40,6 +40,11 @@ public class SQLiteConnection: Connection {
     private var location: Location
     private var inTransaction = false
     
+    /// An indication whether there is a connection to the database.
+    public var isConnected: Bool {
+        return connection != nil
+    }
+    
     /// The `QueryBuilder` with SQLite specific substitutions.
     public var queryBuilder: QueryBuilder
     
@@ -73,6 +78,38 @@ public class SQLiteConnection: Connection {
         closeConnection()
     }
     
+    /// Create a connection pool for SQLiteConnection's.
+    ///
+    /// - Parameter location: Describes where the database is stored.
+    /// - Returns: The `ConnectionPool` of `SQLiteConnection`.
+    public static func createPool(_ location: Location = .inMemory, poolOptions: ConnectionPoolOptions) -> ConnectionPool {
+        let connectionGenerator: () -> Connection? = {
+            let connection = SQLiteConnection(location)
+            if sqlite3_open(location.description, &connection.connection) != SQLITE_OK {
+                return nil
+            }
+            else {
+                // Set the busy timeout to 200 milliseconds.
+                sqlite3_busy_timeout(connection.connection, 200)
+                return connection
+            }
+        }
+        
+        let connectionReleaser: (_ connection: Connection) -> () = { connection in
+            connection.closeConnection()
+        }
+        
+        return ConnectionPool(options: poolOptions, connectionGenerator: connectionGenerator, connectionReleaser: connectionReleaser)
+    }
+
+    /// Create a connection pool for SQLiteConnection's.
+    ///
+    /// - Parameter filename: The path where the database is stored.
+    /// - Returns: The `ConnectionPool` of `SQLiteConnection`.
+    public static func createPool(filename: String, poolOptions: ConnectionPoolOptions) -> ConnectionPool {
+        return createPool(.uri(filename), poolOptions: poolOptions)
+    }
+    
     /// Establish a connection with the database.
     ///
     /// - Parameter onCompletion: The function to be called when the connection is established.
@@ -82,6 +119,7 @@ public class SQLiteConnection: Connection {
         if resultCode != SQLITE_OK {
             let error: String? = String(validatingUTF8: sqlite3_errmsg(connection))
             queryError = QueryError.connection(error!)
+            connection = nil
         }
         else {
             // Set the busy timeout to 200 milliseconds.
