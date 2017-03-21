@@ -227,7 +227,7 @@ public class SQLiteConnection: Connection {
             
             // Numbered parameters
             for (i, parameter) in parameters.enumerated() {
-                if let error = bind(parameter: parameter, at: i+1, statement: sqliteStatement!) {
+                if let error = bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement!) {
                     sqlite3_finalize(sqliteStatement)
                     onCompletion(.error(error))
                     return
@@ -253,9 +253,12 @@ public class SQLiteConnection: Connection {
             case SQLITE_ROW:
                 onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement!))))
             default:
-                let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement!))
+                var errorMessage = "Failed to execute the query."
+                if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement!)) {
+                    errorMessage += " Error: \(error)"
+                }
                 sqlite3_finalize(sqliteStatement)
-                onCompletion(.error(QueryError.databaseError("Failed to execute the query. Error: \(error)")))
+                onCompletion(.error(QueryError.databaseError(errorMessage)))
             }
         }
     }

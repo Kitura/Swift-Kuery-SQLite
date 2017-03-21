@@ -52,7 +52,6 @@ class TestInsert: XCTestCase {
         let t = MyTable()
         let t2 = MyTable2()
         
-        let connection = createConnection()
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
             
