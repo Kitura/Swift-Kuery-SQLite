@@ -54,7 +54,7 @@ public class SQLiteConnection: Connection {
     /// - Returns: An instance of `SQLiteConnection`.
     public init(_ location: Location = .inMemory) {
         self.location = location
-        self.queryBuilder = QueryBuilder(name: "SQLite", anyOnSubquerySupported: false)
+        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false)
         queryBuilder.updateSubstitutions(
             [
                 QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
