@@ -102,7 +102,7 @@ class TestParameters: XCTestCase {
                                             XCTAssertEqual(rows![2][1]! as! Int32, 4, "Wrong value in row 2 column 1")
                                             
                                             let u2 = Update(t, set: [(t.a, Parameter("first")), (t.b, Parameter("second"))], where: t.a == "banana")
-                                            executeQueryWithParameters(query: u2, connection: connection, parameters: "peach", 2) { result, rows in
+                                            executeQueryWithNamedParameters(query: u2, connection: connection, parameters: ["second":2, "first":"peach"]) { result, rows in
                                                 XCTAssertEqual(result.success, true, "UPDATE failed")
                                                 XCTAssertNil(result.asError, "Error in UPDATE: \(result.asError!)")
                                                 

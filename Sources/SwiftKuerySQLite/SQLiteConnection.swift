@@ -236,7 +236,7 @@ public class SQLiteConnection: Connection {
             
             // Named parameters
             for (name, parameter) in namedParameters {
-                let index = sqlite3_bind_parameter_index(sqliteStatement, name)
+                let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
                 if let error = bind(parameter: parameter, at: index, statement: sqliteStatement!) {
                     sqlite3_finalize(sqliteStatement)
                     onCompletion(.error(error))
