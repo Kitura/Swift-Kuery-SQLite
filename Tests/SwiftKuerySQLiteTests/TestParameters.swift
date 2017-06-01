@@ -21,8 +21,10 @@ import SwiftKuery
 
 #if os(Linux)
 let tableParameters = "tableParametersLinux"
+let tablePreparedStatements = "tablePreparedStatementsLinux"
 #else
 let tableParameters = "tableParametersOSX"
+let tablePreparedStatements = "tablePreparedStatementsOSX"
 #endif
 
 class TestParameters: XCTestCase {
@@ -30,6 +32,7 @@ class TestParameters: XCTestCase {
     static var allTests: [(String, (TestParameters) -> () throws -> Void)] {
         return [
             ("testParameters", testParameters),
+            ("testPreparedStatements", testPreparedStatements),
         ]
     }
     
@@ -131,4 +134,86 @@ class TestParameters: XCTestCase {
             expectation.fulfill()
         })
     }
+    
+    class PreparedTable: Table {
+        let a = Column("a", Varchar.self, length: 40)
+        let b = Column("b", Int32.self)
+        
+        let tableName = tablePreparedStatements
+    }
+    
+    func testPreparedStatements() {
+        let t = PreparedTable()
+        
+        let pool = CommonUtils.sharedInstance.getConnectionPool()
+        performTest(asyncTasks: { expectation in
+            
+            guard let connection = pool.getConnection() else {
+                XCTFail("Failed to get connection")
+                return
+            }
+            
+            cleanUp(table: t.tableName, connection: connection) { result in
+                
+                t.create(connection: connection) { result in
+                    XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                    XCTAssertNil(result.asError)
+                    
+                    do {
+                        let i1 = Insert(into: t, rows: [[Parameter(), 10], ["banana", Parameter()], [Parameter(), Parameter()]])
+                        let preparedInsert = try connection.prepareStatement(i1)
+                        
+                        let s1 = Select(from: t).where(t.a == Parameter("fruit"))
+                        let preparedSelect = try connection.prepareStatement(s1)
+                        
+                        let s2 = "SELECT * FROM " + t.tableName
+                        let preparedSelect2 = try connection.prepareStatement(s2)
+                        
+                        connection.execute(preparedStatement: preparedInsert, parameters: ["apple", 3, "banana", -8]) { result in
+                            XCTAssertEqual(result.success, true, "INSERT failed")
+                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+                            
+                            connection.execute(preparedStatement: preparedSelect, parameters: ["fruit":"apple"]) { result in
+                                XCTAssertEqual(result.success, true, "SELECT failed")
+                                let rows = result.asRows
+                                XCTAssertNotNil(rows, "SELECT returned no rows")
+                                XCTAssertEqual(rows!.count, 1, "Wrong number of rows")
+                                
+                                connection.execute(preparedStatement: preparedSelect, parameters: ["fruit":"banana"]) { result in
+                                    XCTAssertEqual(result.success, true, "SELECT failed")
+                                    let rows = result.asRows
+                                    XCTAssertNotNil(rows, "SELECT returned no rows")
+                                    XCTAssertEqual(rows!.count, 2, "Wrong number of rows")
+                                    
+                                    connection.execute(preparedStatement: preparedSelect2) { result in
+                                        XCTAssertEqual(result.success, true, "SELECT failed")
+                                        let rows = result.asRows
+                                        XCTAssertNotNil(rows, "SELECT returned no rows")
+                                        XCTAssertEqual(rows!.count, 3, "Wrong number of rows")
+                                        
+                                        connection.release(preparedStatement: preparedInsert) { result in
+                                            XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                            
+                                            connection.release(preparedStatement: preparedSelect) { result in
+                                                XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                
+                                                connection.release(preparedStatement: preparedSelect2) { result in
+                                                    XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch {
+                        XCTFail("\(error)")
+                    }
+                }
+            }
+            expectation.fulfill()
+        })
+    }
+    
 }

@@ -210,59 +210,135 @@ public class SQLiteConnection: Connection {
         }
     }
     
-    private func execute(sqliteQuery: String, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
-        do {
-            var sqliteStatement: OpaquePointer?
-            var sqlTail: UnsafePointer<Int8>? = nil
-            
-            // Prepare SQLite statement
-            var resultCode = sqlite3_prepare_v2(connection, sqliteQuery, -1, &sqliteStatement, &sqlTail)
-            guard resultCode == SQLITE_OK else {
-                onCompletion(.error(createError("Failed to prepare the query statement.", errorCode: resultCode)))
-                return
-            }
-            
-            // Bind parameters: either numbered parameters or named parameters can be passed,
-            // mixing of both types of parameters in one query is not supported
-            
-            // Numbered parameters
-            for (i, parameter) in parameters.enumerated() {
-                if let error = bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement!) {
-                    sqlite3_finalize(sqliteStatement)
-                    onCompletion(.error(error))
-                    return
-                }
-            }
-            
-            // Named parameters
-            for (name, parameter) in namedParameters {
-                let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
-                if let error = bind(parameter: parameter, at: index, statement: sqliteStatement!) {
-                    sqlite3_finalize(sqliteStatement)
-                    onCompletion(.error(error))
-                    return
-                }
-            }
-            
-            // Execute and get result
-            resultCode = sqlite3_step(sqliteStatement)
-            switch resultCode {
-            case SQLITE_DONE:
-                sqlite3_finalize(sqliteStatement)
-                onCompletion(.successNoData)
-            case SQLITE_ROW:
-                onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement!))))
-            default:
-                var errorMessage = "Failed to execute the query."
-                if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement!)) {
-                    errorMessage += " Error: \(error)"
-                }
-                sqlite3_finalize(sqliteStatement)
-                onCompletion(.error(QueryError.databaseError(errorMessage)))
-            }
-        }
+    /// Prepare statement.
+    ///
+    /// - Parameter query: The query to prepare statement for.
+    /// - Returns: The prepared statement.
+    /// - Throws: QueryError.syntaxError if query build fails, or a database error if it fails to prepare statement.
+    public func prepareStatement(_ query: Query) throws -> PreparedStatement {
+        let sqliteQuery = try query.build(queryBuilder: queryBuilder)
+        return try prepareStatement(sqliteQuery)
     }
     
+    /// Prepare statement.
+    ///
+    /// - Parameter raw: A String with the query to prepare statement for.
+    /// - Returns: The prepared statement.
+    /// - Throws: QueryError.syntaxError if query build fails, or a database error if it fails to prepare statement.
+    public func prepareStatement(_ raw: String) throws -> PreparedStatement {
+        let (sqliteStatement, resultCode) =  prepareSQLiteStatement(query: raw)
+        guard sqliteStatement != nil, resultCode == SQLITE_OK else {
+            throw(createError("Failed to prepare statement.", errorCode: resultCode))
+        }
+        return SQLitePreparedStatement(statement: sqliteStatement!)
+    }
+
+    /// Execute a prepared statement.
+    ///
+    /// - Parameter preparedStatement: The prepared statement to execute.
+    /// - Parameter onCompletion: The function to be called when the execution has completed.
+    public func execute(preparedStatement: PreparedStatement, onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
+    }
+    
+    /// Execute a prepared statement with parameters.
+    ///
+    /// - Parameter preparedStatement: The prepared statement to execute.
+    /// - Parameter parameters: An array of the parameters.
+    /// - Parameter onCompletion: The function to be called when the execution has completed.
+    public func execute(preparedStatement: PreparedStatement, parameters: [Any?], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(preparedStatement: preparedStatement, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
+    }
+    
+    /// Execute a prepared statement with parameters.
+    ///
+    /// - Parameter preparedStatement: The prepared statement to execute.
+    /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
+    /// - Parameter onCompletion: The function to be called when the execution has completed.
+    public func execute(preparedStatement: PreparedStatement, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
+        execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
+    }
+    
+    private func execute(preparedStatement: PreparedStatement, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
+        guard let statement = preparedStatement as? SQLitePreparedStatement else {
+            onCompletion(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")))
+            return
+        }
+        execute(sqliteStatement: statement.statement, parameters: parameters, namedParameters: namedParameters, finalize: false, onCompletion: onCompletion)
+    }
+    
+    /// Release a prepared statement.
+    ///
+    /// - Parameter preparedStatement: The prepared statement to release.
+    /// - Parameter onCompletion: The function to be called when the execution has completed.
+    public func release(preparedStatement: PreparedStatement, onCompletion: @escaping ((QueryResult) -> ())) {
+        guard let statement = preparedStatement as? SQLitePreparedStatement else {
+            onCompletion(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")))
+            return
+        }
+        sqlite3_finalize(statement.statement)
+        onCompletion(.successNoData)
+    }
+
+    private func prepareSQLiteStatement(query: String) -> (OpaquePointer?, Int32) {
+        var sqliteStatement: OpaquePointer?
+        var sqlTail: UnsafePointer<Int8>? = nil
+        
+        let resultCode = sqlite3_prepare_v2(connection, query, -1, &sqliteStatement, &sqlTail)
+        return (sqliteStatement, resultCode)
+    }
+    
+    private func execute(sqliteQuery: String, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
+        // Prepare SQLite statement
+        let (sqliteStatement, resultCode) =  prepareSQLiteStatement(query: sqliteQuery)
+        guard sqliteStatement != nil, resultCode == SQLITE_OK else {
+            onCompletion(.error(createError("Failed to prepare the query statement.", errorCode: resultCode)))
+            return
+        }
+        execute(sqliteStatement: sqliteStatement!, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+    }
+    
+    private func execute(sqliteStatement: OpaquePointer, parameters: [Any?], namedParameters: [String:Any?], finalize: Bool = true, onCompletion: (@escaping (QueryResult) -> ())) {
+        // Bind parameters: either numbered parameters or named parameters can be passed,
+        // mixing of both types of parameters in one query is not supported
+        
+        // Numbered parameters
+        for (i, parameter) in parameters.enumerated() {
+            if let error = bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement) {
+                Utils.clear(statement: sqliteStatement, finalize: finalize)
+                onCompletion(.error(error))
+                return
+            }
+        }
+        
+        // Named parameters
+        for (name, parameter) in namedParameters {
+            let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
+            if let error = bind(parameter: parameter, at: index, statement: sqliteStatement) {
+                Utils.clear(statement: sqliteStatement, finalize: finalize)
+                onCompletion(.error(error))
+                return
+            }
+        }
+        
+        // Execute and get result
+        let executionResultCode = sqlite3_step(sqliteStatement)
+        switch executionResultCode {
+        case SQLITE_DONE:
+            Utils.clear(statement: sqliteStatement, finalize: finalize)
+            onCompletion(.successNoData)
+        case SQLITE_ROW:
+            onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize))))
+        default:
+            var errorMessage = "Failed to execute the query."
+            if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement)) {
+                errorMessage += " Error: \(error)"
+            }
+            Utils.clear(statement: sqliteStatement, finalize: finalize)
+            onCompletion(.error(QueryError.databaseError(errorMessage)))
+        }
+    }
+        
     private func bind(parameter: Any?, at index: Int32, statement: OpaquePointer) -> QueryError? {
         var resultCode: Int32
         if parameter == nil {

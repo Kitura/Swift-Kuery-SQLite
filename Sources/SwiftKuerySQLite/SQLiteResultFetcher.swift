@@ -32,8 +32,10 @@ public class SQLiteResultFetcher: ResultFetcher {
     private let sqliteStatement: OpaquePointer
     private let numberOfColumns: Int32
     private var hasMoreRows = true
+    private var finalize: Bool
     
-    init(sqliteStatement: OpaquePointer) {
+    init(sqliteStatement: OpaquePointer, finalize: Bool) {
+        self.finalize = finalize
         numberOfColumns = sqlite3_column_count(sqliteStatement)
         var columnNames = [String]()
         for i in 0..<numberOfColumns {
@@ -49,7 +51,7 @@ public class SQLiteResultFetcher: ResultFetcher {
     
     deinit {
         if hasMoreRows {
-            sqlite3_finalize(sqliteStatement)
+            Utils.clear(statement: sqliteStatement, finalize: finalize)
         }
     }
     
@@ -70,7 +72,7 @@ public class SQLiteResultFetcher: ResultFetcher {
             return buildRow()
         default:
             hasMoreRows = false
-            sqlite3_finalize(sqliteStatement)
+            Utils.clear(statement: sqliteStatement, finalize: finalize)
         }
         return nil
     }
