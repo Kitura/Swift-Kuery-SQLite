@@ -1,4 +1,7 @@
 # Swift-Kuery-SQLite
+
+🚫 This project is no longer maintained.
+
 SQLite plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework.
 
 [![Build Status - Master](https://travis-ci.org/IBM-Swift/Kitura.svg?branch=master)](https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite)
