@@ -60,7 +60,10 @@ public class SQLiteConnection: Connection {
                 QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
                 QueryBuilder.QuerySubstitutionNames.lcase : "LOWER",
                 QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
-                QueryBuilder.QuerySubstitutionNames.now : "'now'",
+                // Note: SQLite's DATETIME() seems to always return UTC results,
+                // whereas MySQL's NOW() will return local (system) time by de-
+                // fault unless configured to use a specific timezone.
+                QueryBuilder.QuerySubstitutionNames.now : "DATETIME()",
                 QueryBuilder.QuerySubstitutionNames.all : "",
                 QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
                 QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
