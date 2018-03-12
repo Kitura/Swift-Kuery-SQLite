@@ -62,8 +62,13 @@ public class SQLiteConnection: Connection {
                 QueryBuilder.QuerySubstitutionNames.len : "LENGTH",
                 // Note: SQLite's DATETIME() seems to always return UTC results,
                 // whereas MySQL's NOW() will return local (system) time by de-
-                // fault unless configured to use a specific timezone.
-                QueryBuilder.QuerySubstitutionNames.now : "DATETIME()",
+                // fault unless configured to use a specific timezone. Also, we
+                // concatcenate " +0000" to the end of the generated formatted
+                // time string since Date objects will be formatted with these
+                // offsets as well and SQLite will consider
+                // "2018-03-11 05:24:15" to be "smaller" than
+                // "2018-03-11 05:24:15 +0000".
+                QueryBuilder.QuerySubstitutionNames.now : "DATETIME() || ' +0000'",
                 QueryBuilder.QuerySubstitutionNames.all : "",
                 QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
                 QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
