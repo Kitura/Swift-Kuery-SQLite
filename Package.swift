@@ -30,12 +30,15 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", from: "1.0.0"),
-        .package(url: "https://github.com/NocturnalSolutions/CSQLite.git", from: "0.2.0")
     ],
     targets: [
         .target(
             name: "SwiftKuerySQLite",
-            dependencies: ["SwiftKuery"]
+            dependencies: ["SwiftKuery", "CSQLite"]
+        ),
+        .target(
+            name: "CSQLite",
+            dependencies: []
         ),
         .testTarget(
             name: "SwiftKuerySQLiteTests",
