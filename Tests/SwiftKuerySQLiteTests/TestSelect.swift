@@ -343,7 +343,7 @@ class TestSelect: XCTestCase {
                                     XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows: \(rows!.count) instead of 1")
                                     
                                     let s3 = Select(from: t)
-                                        .where(now() > t.date)
+                                        .where(now() >= t.date)
                                     executeQuery(query: s3, connection: connection) { result, rows in
                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                         XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")

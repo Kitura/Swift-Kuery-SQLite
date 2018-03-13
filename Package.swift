@@ -1,3 +1,6 @@
+// swift-tools-version:4.0
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
 /**
  * Copyright IBM Corporation 2016, 2017
  *
@@ -19,11 +22,27 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftKuerySQLite",
-    targets: [Target(name: "SwiftKuerySQLite", dependencies: [.Target(name: "CSQLite")]),
-              Target(name: "CSQLite")
+    products: [
+        .library(
+            name: "SwiftKuerySQLite",
+            targets: ["SwiftKuerySQLite"]
+        )
     ],
     dependencies: [
-        .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 13),
-        ],
-    exclude: ["Configuration", "Scripts"]
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", from: "1.0.0"),
+    ],
+    targets: [
+        .target(
+            name: "SwiftKuerySQLite",
+            dependencies: ["SwiftKuery", "CSQLite"]
+        ),
+        .target(
+            name: "CSQLite",
+            dependencies: []
+        ),
+        .testTarget(
+            name: "SwiftKuerySQLiteTests",
+            dependencies: ["SwiftKuerySQLite"]
+        )
+    ]
 )

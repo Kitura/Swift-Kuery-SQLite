@@ -5,3 +5,5 @@ build
 /.build
 /Packages
 /*.xcodeproj
+Package.resolved
+

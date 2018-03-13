@@ -1,8 +1,6 @@
 # Swift-Kuery-SQLite
 
-🚫 This project is no longer maintained.
-
-SQLite plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework.
+[SQLite](https://sqlite.org/) plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework.
 
 [![Build Status - Master](https://travis-ci.org/IBM-Swift/Kitura.svg?branch=master)](https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
@@ -17,8 +15,19 @@ SQLite plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) fr
 To use Swift-Kuery-SQLite you must install SQLite.
 
 ### macOS
+
+You can install SQLite with Homebrew:
+
 ```
 $ brew install sqlite
+```
+
+Or, if you prefer MacPorts, you can use that too, though note that you need to symlink a file into the place that Homebrew installs it:
+
+```
+$ port install sqlite3
+$ mkdir -p /usr/local/opt/sqlite/include
+$ ln -s /opt/local/include/sqlite3.h /usr/local/opt/sqlite/include/
 ```
 
 ### Linux
@@ -40,7 +49,7 @@ To establish a connection call:
 db.connect(onCompletion: (QueryError?) -> ())
 ```
 
-You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the [Kuery](https://github.com/IBM-Swift/Swift-Kuery) documentation for more information.
+You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the [Kuery](https://github.com/IBM-Swift/Swift-Kuery) documentation for more information, or see the [Database Connectivity with Kuery](https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html) chapter of the *[Kitura Until Dawn](https://www.gitbook.com/book/nocturnalsolutions/kitura-book)* guidebook/tutorial.
 
 ## License
 This library is licensed under Apache 2.0. Full license text is available in [LICENSE](LICENSE.txt).
