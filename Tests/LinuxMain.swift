@@ -30,7 +30,7 @@ extension MutableCollection where Indices.Iterator.Element == Index {
             let d: IndexDistance = numericCast(random() % numericCast(unshuffledCount))
             guard d != 0 else { continue }
             let i = index(firstUnshuffled, offsetBy: d)
-            self.swap(firstUnshuffled, i)
+            self.swapAt(firstUnshuffled, i)
         }
     }
 }
