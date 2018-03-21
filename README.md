@@ -16,7 +16,7 @@ To use Swift-Kuery-SQLite you must install SQLite.
 
 ### macOS
 
-You can install SQLite with Homebrew:
+You can install SQLite with [Homebrew](https://brew.sh/):
 
 ```
 $ brew install sqlite
