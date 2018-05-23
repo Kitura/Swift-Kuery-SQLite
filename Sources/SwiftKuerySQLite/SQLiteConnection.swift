@@ -54,7 +54,7 @@ public class SQLiteConnection: Connection {
     /// - Returns: An instance of `SQLiteConnection`.
     public init(_ location: Location = .inMemory) {
         self.location = location
-        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false)
+        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false, createAutoIncrement: SQLiteConnection.createAutoIncrement)
         queryBuilder.updateSubstitutions(
             [
                 QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
@@ -72,6 +72,14 @@ public class SQLiteConnection: Connection {
                 QueryBuilder.QuerySubstitutionNames.all : "",
                 QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
                 QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
+    }
+
+    static func createAutoIncrement(_ type: String, _ primaryKey: Bool) -> String {
+        if primaryKey && type == "integer" {
+            return type + "AUTOINCREMENT"
+        } else {
+            return ""
+        }
     }
     
     /// Initialiser with a path to where the database is stored.
