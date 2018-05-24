@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-#if os(OSX)
+#if os(OSX) && swift(>=4.1)
     import XCTest
     
     class VerifyLinuxTestCount: XCTestCase {

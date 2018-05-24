@@ -39,7 +39,7 @@ class TestSchema: XCTestCase {
     
     class MyTable: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi", collate: "BINARY")
-        let b = Column("b", Int32.self, autoIncrement: true)
+        let b = Column("b", Int32.self)
         let c = Column("c", Double.self, defaultValue: 4.95, check: "c > 0")
         
         let tableName = "MyTable" + tableNameSuffix
@@ -47,7 +47,7 @@ class TestSchema: XCTestCase {
     
     class MyNewTable: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
-        let b = Column("b", Int32.self, autoIncrement: true)
+        let b = Column("b", Int32.self)
         let c = Column("c", Double.self, defaultValue: 4.95)
         let d = Column("d", Int32.self, defaultValue: 123)
         
