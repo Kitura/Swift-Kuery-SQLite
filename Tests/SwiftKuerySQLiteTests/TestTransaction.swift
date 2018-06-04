@@ -58,7 +58,7 @@ class TestTransaction: XCTestCase {
             
             cleanUp(table: t.tableName, connection: connection) { result in
                 
-                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                     
@@ -109,7 +109,7 @@ class TestTransaction: XCTestCase {
             
             cleanUp(table: t.tableName, connection: connection) { result in
                 
-                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                     
@@ -163,7 +163,7 @@ class TestTransaction: XCTestCase {
                     XCTAssertEqual(result.success, true, "Failed to start transaction")
                     XCTAssertNil(result.asError, "Error in start transaction: \(result.asError!)")
                     
-                    executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                    executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                         XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                         XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                         
@@ -265,7 +265,7 @@ class TestTransaction: XCTestCase {
                             connection.startTransaction() { result in
                                 XCTAssertEqual(result.success, false, "Started second transaction")
                                 
-                                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                                     
@@ -322,7 +322,7 @@ class TestTransaction: XCTestCase {
                             XCTAssertEqual(result.success, true, "Failed to start transaction")
                             XCTAssertNil(result.asError, "Error in start transaction: \(result.asError!)")
                             
-                            executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                            executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                                 XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                                 XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                                 
@@ -377,7 +377,7 @@ class TestTransaction: XCTestCase {
                             XCTAssertEqual(result.success, true, "Failed to start transaction")
                             XCTAssertNil(result.asError, "Error in start transaction: \(result.asError!)")
                             
-                            executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                            executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                                 XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                                 XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                                 
