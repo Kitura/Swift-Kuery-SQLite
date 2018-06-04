@@ -360,7 +360,7 @@ public class SQLiteConnection: Connection {
                 resultCode = sqlite3_bind_double(statement, index, Double(value))
             case let value as Double:
                 resultCode = sqlite3_bind_double(statement, index, value)
-            case let value as  Int32:
+            case let value as Int32:
                 resultCode = sqlite3_bind_int(statement, index, value)
             case let value as Int:
                 resultCode = sqlite3_bind_int64(statement, index, Int64(value))
