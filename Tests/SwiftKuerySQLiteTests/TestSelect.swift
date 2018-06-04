@@ -75,7 +75,7 @@ class TestSelect: XCTestCase {
             
             cleanUp(table: t.tableName, connection: connection) { result in
                 
-                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                     
@@ -191,7 +191,7 @@ class TestSelect: XCTestCase {
                                                                 XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows: \(rows!.count) instead of 2")
                                                                 XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
                                                                 
-                                                                let s9 = "Select * from \(t.tableName) where a IN ('apple', 'lalala')"
+                                                                let s9 = "Select * from \"\(t.tableName)\" where a IN ('apple', 'lalala')"
                                                                 executeRawQuery(s9, connection: connection) { result, rows in
                                                                     XCTAssertEqual(result.success, true, "SELECT failed")
                                                                     XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
@@ -239,15 +239,15 @@ class TestSelect: XCTestCase {
                 cleanUp(table: t2.tableName, connection: connection) { result in
                     cleanUp(table: t3.tableName, connection: connection) { result in
                         
-                        executeRawQuery("CREATE TABLE " +  t1.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                        executeRawQuery("CREATE TABLE \"" +  t1.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                             XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                             XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                             
-                            executeRawQuery("CREATE TABLE " +  t2.tableName + " (c varchar(40), b integer)", connection: connection) { result, rows in
+                            executeRawQuery("CREATE TABLE \"" +  t2.tableName + "\" (c varchar(40), b integer)", connection: connection) { result, rows in
                                 XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                                 XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                                 
-                                executeRawQuery("CREATE TABLE " +  t3.tableName + " (d varchar(40), b integer)", connection: connection) { result, rows in
+                                executeRawQuery("CREATE TABLE \"" +  t3.tableName + "\" (d varchar(40), b integer)", connection: connection) { result, rows in
                                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                                     
@@ -311,7 +311,7 @@ class TestSelect: XCTestCase {
             
             cleanUp(table: t.tableName, connection: connection) { result in
                 
-                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), date date, timestamp timestamp, time time)", connection: connection) { result, rows in
+                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), date date, timestamp timestamp, time time)", connection: connection) { result, rows in
                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                     

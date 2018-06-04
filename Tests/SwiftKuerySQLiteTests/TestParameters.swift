@@ -56,7 +56,7 @@ class TestParameters: XCTestCase {
             
             cleanUp(table: t.tableName, connection: connection) { result in
                 
-                executeRawQuery("CREATE TABLE " +  t.tableName + " (a varchar(40), b integer)", connection: connection) { result, rows in
+                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
                     XCTAssertEqual(result.success, true, "CREATE TABLE failed")
                     XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                     
@@ -91,7 +91,7 @@ class TestParameters: XCTestCase {
                                     XCTAssertEqual(rows![2][0]! as! String, "peach", "Wrong value in row 2 column 0")
                                     XCTAssertEqual(rows![2][1]! as! Int32, 2, "Wrong value in row 2 column 1")
                                     
-                                    let raw = "UPDATE " + t.tableName + " SET a = 'banana', b = $1 WHERE a = $2"
+                                    let raw = "UPDATE \"" + t.tableName + "\" SET a = 'banana', b = $1 WHERE a = $2"
                                     executeRawQueryWithParameters(raw, connection: connection, parameters: 4, "peach") { result, rows in
                                         XCTAssertEqual(result.success, true, "UPDATE failed")
                                         XCTAssertNil(result.asError, "Error in UPDATE: \(result.asError!)")
