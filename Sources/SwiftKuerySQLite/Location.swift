@@ -26,6 +26,9 @@ public enum Location {
     
     /// The URI where the database is stored.
     case uri(String)
+
+    /// In memory database that is shared across a connection pool
+    case inMemoryShared
 }
 
 extension Location: CustomStringConvertible {
@@ -38,6 +41,8 @@ extension Location: CustomStringConvertible {
             return ""
         case .uri(let uri):
             return uri
+        case .inMemoryShared:
+            return "file::memory:?cache=shared"
         }
     }
 }
