@@ -98,7 +98,7 @@ public class SQLiteConnection: Connection {
     ///
     /// - Parameter location: Describes where the database is stored.
     /// - Returns: The `ConnectionPool` of `SQLiteConnection`.
-    public static func createPool(_ location: Location = .inMemory, poolOptions: ConnectionPoolOptions) -> ConnectionPool {
+    public static func createPool(_ location: Location = .inMemoryShared, poolOptions: ConnectionPoolOptions) -> ConnectionPool {
         let connectionGenerator: () -> Connection? = {
             let connection = SQLiteConnection(location)
             if sqlite3_open(location.description, &connection.connection) != SQLITE_OK {
