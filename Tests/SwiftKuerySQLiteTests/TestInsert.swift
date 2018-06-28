@@ -22,9 +22,11 @@ import SwiftKuery
 #if os(Linux)
 let tableInsert = "tableInsertLinux"
 let tableInsert2 = "tableInsert2Linux"
+let tableInsert3 = "tableInsert3Linux"
 #else
 let tableInsert = "tableInsertOSX"
 let tableInsert2 = "tableInsert2OSX"
+let tableInsert3 = "tableInsert3OSX"
 #endif
 
 class TestInsert: XCTestCase {
@@ -48,6 +50,14 @@ class TestInsert: XCTestCase {
         
         let tableName = tableInsert2
     }
+
+    class MyTable3 : Table {
+        let a = Column("a", autoIncrement: true, primaryKey: true)
+        let b = Column("b")
+
+        let tableName = tableInsert3
+    }
+
     func testInsert() {
         let t = MyTable()
         let t2 = MyTable2()
@@ -129,6 +139,44 @@ class TestInsert: XCTestCase {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            expectation.fulfill()
+        })
+    }
+
+    func testInsertID() {
+        let t3 = MyTable3()
+
+        let pool = CommonUtils.sharedInstance.getConnectionPool()
+        performTest(asyncTasks: { expectation in
+
+            guard let connection = pool.getConnection() else {
+                XCTFail("Failed to get connection")
+                return
+            }
+
+            cleanUp(table: t3.tableName, connection: connection) { result in
+                executeRawQuery("CREATE TABLE \"" +  t3.tableName + "\" (a INTEGER PRIMARY KEY AUTOINCREMENT, b integer)", connection: connection) { result, rows in
+                    XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                    XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
+                    let i7 = Insert(into: t3, valueTuples: [(t3.b, 5)], returnID: true)
+                    executeQuery(query: i7, connection: connection) { result, rows in
+                        XCTAssertEqual(result.success, true, "INSERT failed")
+                        XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+                        XCTAssertNotNil(result.asResultSet, "INSERT returned no rows")
+                        XCTAssertNotNil(rows, "INSERT returned no rows")
+                        if let resultSet = result.asResultSet, let rows = rows {
+                          XCTAssertEqual(resultSet.titles.count, 1, "Wrong number of columns: \(resultSet.titles.count) instead of 1")
+                          XCTAssertEqual(rows.count, 1, "INSERT returned wrong number of rows: \(rows.count) instead of 1")
+                        }
+
+                        let dropT3 = Raw(query: "DROP TABLE", table: t3)
+                        executeQuery(query: dropT3, connection: connection) { result, rows in
+                            XCTAssertEqual(result.success, true, "DROP TABLE failed")
+                            XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
                         }
                     }
                 }
