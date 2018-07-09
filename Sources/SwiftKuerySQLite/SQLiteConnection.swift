@@ -218,9 +218,17 @@ public class SQLiteConnection: Connection {
     }
 
     private func execute(query: Query, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
+        var wrappedOnCompletion: ((QueryResult) -> ())? = nil
+        if let insertQuery = query as? Insert, insertQuery.returnID {
+            wrappedOnCompletion = { queryResult in
+                // Note that this method appears to be more reliable than using
+                // last_insert_rowid().
+                self.execute("SELECT seq AS id FROM sqlite_sequence WHERE name = @1", parameters: [insertQuery.table.nameInQuery], onCompletion: onCompletion)
+            }
+        }
         do {
             let sqliteQuery = try query.build(queryBuilder: queryBuilder)
-            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: wrappedOnCompletion ?? onCompletion)
         }
         catch QueryError.syntaxError(let error) {
             onCompletion(.error(QueryError.syntaxError(error)))
