@@ -54,7 +54,7 @@ public class SQLiteConnection: Connection {
     /// - Returns: An instance of `SQLiteConnection`.
     public init(_ location: Location = .inMemory) {
         self.location = location
-        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false, createAutoIncrement: SQLiteConnection.createAutoIncrement)
+        self.queryBuilder = QueryBuilder(anyOnSubquerySupported: false, createAutoIncrement: SQLiteConnection.createAutoIncrement, createSinglePrimaryKey: SQLiteConnection.createSinglePrimaryKey)
         queryBuilder.updateSubstitutions(
             [
                 QueryBuilder.QuerySubstitutionNames.ucase : "UPPER",
@@ -76,10 +76,14 @@ public class SQLiteConnection: Connection {
 
     static func createAutoIncrement(_ type: String, _ primaryKey: Bool) -> String {
         if primaryKey && type == "integer" {
-            return type + "AUTOINCREMENT"
+            return type + " PRIMARY KEY AUTOINCREMENT"
         } else {
             return ""
         }
+    }
+
+    static func createSinglePrimaryKey(_ type: String, _ autoIncrement: Bool) -> String {
+        return autoIncrement ? "" : " PRIMARY KEY"
     }
     
     /// Initialiser with a path to where the database is stored.
@@ -214,9 +218,17 @@ public class SQLiteConnection: Connection {
     }
 
     private func execute(query: Query, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
+        var wrappedOnCompletion: ((QueryResult) -> ())? = nil
+        if let insertQuery = query as? Insert, insertQuery.returnID {
+            wrappedOnCompletion = { queryResult in
+                // Note that this method appears to be more reliable than using
+                // last_insert_rowid().
+                self.execute("SELECT seq AS id FROM sqlite_sequence WHERE name = @1", parameters: [insertQuery.table.nameInQuery], onCompletion: onCompletion)
+            }
+        }
         do {
             let sqliteQuery = try query.build(queryBuilder: queryBuilder)
-            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: wrappedOnCompletion ?? onCompletion)
         }
         catch QueryError.syntaxError(let error) {
             onCompletion(.error(QueryError.syntaxError(error)))
