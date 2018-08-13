@@ -50,6 +50,10 @@ public class SQLiteResultFetcher: ResultFetcher {
     }
     
     deinit {
+        done()
+    }
+
+    public func done() {
         if hasMoreRows {
             Utils.clear(statement: sqliteStatement, finalize: finalize)
         }

@@ -16,6 +16,7 @@
 
 import XCTest
 import SwiftKuery
+import Dispatch
 
 @testable import SwiftKuerySQLite
 
@@ -54,6 +55,8 @@ class TestInsert: XCTestCase {
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
+
+            let semaphore = DispatchSemaphore(value: 0)
             
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -121,6 +124,7 @@ class TestInsert: XCTestCase {
                                                         executeQuery(query: drop, connection: connection) { result, rows in
                                                             XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                                             XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                                            semaphore.signal()
                                                         }
                                                     }
                                                 }
@@ -133,6 +137,7 @@ class TestInsert: XCTestCase {
                     }
                 }
             }
+            semaphore.wait()
             expectation.fulfill()
         })
     }

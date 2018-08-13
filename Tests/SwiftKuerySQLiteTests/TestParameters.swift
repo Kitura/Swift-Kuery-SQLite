@@ -16,6 +16,7 @@
 
 import XCTest
 import SwiftKuery
+import Dispatch
 
 @testable import SwiftKuerySQLite
 
@@ -48,6 +49,8 @@ class TestParameters: XCTestCase {
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
+
+            let semaphore = DispatchSemaphore(value: 0)
             
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -120,6 +123,7 @@ class TestParameters: XCTestCase {
                                                     let s2 = Select(from: t).where(t.a != Parameter())
                                                     executeQueryWithParameters(query: s2, connection: connection, parameters: nil) { result, rows in
                                                         XCTAssertEqual(result.success, true, "SELECT failed")
+                                                        semaphore.signal()
                                                     }
                                                 }
                                             }
@@ -131,6 +135,7 @@ class TestParameters: XCTestCase {
                     }
                 }
             }
+            semaphore.wait()
             expectation.fulfill()
         })
     }
@@ -147,6 +152,8 @@ class TestParameters: XCTestCase {
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
+
+            let semaphore = DispatchSemaphore(value: 0)
             
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -199,6 +206,7 @@ class TestParameters: XCTestCase {
                                                 
                                                 connection.release(preparedStatement: preparedSelect2) { result in
                                                     XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                    semaphore.signal()
                                                 }
                                             }
                                         }
@@ -212,6 +220,7 @@ class TestParameters: XCTestCase {
                     }
                 }
             }
+            semaphore.wait()
             expectation.fulfill()
         })
     }

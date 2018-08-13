@@ -16,6 +16,7 @@
 
 import XCTest
 import SwiftKuery
+import Dispatch
 
 @testable import SwiftKuerySQLite
 
@@ -45,6 +46,8 @@ class TestAlias: XCTestCase {
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
+
+            let semaphore = DispatchSemaphore(value: 0)
             
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -89,12 +92,14 @@ class TestAlias: XCTestCase {
                                     let resultSet = result.asResultSet!
                                     XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
                                     XCTAssertEqual(resultSet.titles[0], "a", "Wrong column name: \(resultSet.titles[0]) instead of 'a'")
+                                    semaphore.signal()
                                 }
                             }
                         }
                     }
                 }
             }
+            semaphore.wait()
             expectation.fulfill()
         })
     }
