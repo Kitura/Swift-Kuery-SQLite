@@ -339,7 +339,7 @@ class TestSchema: XCTestCase {
     }
 
     class AutoIncrement1: Table {
-        let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
+        let a = Column("a", String.self, defaultValue: "qiwi")
         let b = Column("b", Int32.self, autoIncrement: true, primaryKey: true)
 
         let tableName = "AutoIncrement1" + tableNameSuffix
@@ -353,7 +353,7 @@ class TestSchema: XCTestCase {
     }
 
     class AutoIncrement3: Table {
-        let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
+        let a = Column("a", String.self, defaultValue: "qiwi")
         let b = Column("b", String.self, autoIncrement: true, primaryKey: true)
 
         let tableName = "AutoIncrement3" + tableNameSuffix
@@ -376,7 +376,7 @@ class TestSchema: XCTestCase {
                     cleanUp(table: t3.tableName, connection: connection) { result in
 
                         t1.create(connection: connection) { result in
-                            XCTAssertEqual(result.success, false, "CREATE TABLE failed for \(t1.tableName)")
+                            XCTAssertEqual(result.success, true, "CREATE TABLE failed for \(t1.tableName)")
 
                             t2.create(connection: connection) { result in
                                 XCTAssertEqual(result.success, false, "CREATE TABLE non primary key auto increment column didn't fail")
