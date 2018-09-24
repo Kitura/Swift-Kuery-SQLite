@@ -69,6 +69,7 @@ public class SQLiteConnection: Connection {
                 // "2018-03-11 05:24:15" to be "smaller" than
                 // "2018-03-11 05:24:15 +0000".
                 QueryBuilder.QuerySubstitutionNames.now : "DATETIME() || ' +0000'",
+                QueryBuilder.QuerySubstitutionNames.mid : "SUBSTR",
                 QueryBuilder.QuerySubstitutionNames.all : "",
                 QueryBuilder.QuerySubstitutionNames.booleanTrue : "1",
                 QueryBuilder.QuerySubstitutionNames.booleanFalse : "0"])
