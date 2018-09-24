@@ -198,11 +198,22 @@ class TestSelect: XCTestCase {
                                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                     XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows: \(rows!.count) instead of 2")
                                                                     XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
-                                                                    
-                                                                    let drop = Raw(query: "DROP TABLE", table: t)
-                                                                    executeQuery(query: drop, connection: connection) { result, rows in
-                                                                        XCTAssertEqual(result.success, true, "DROP TABLE failed")
-                                                                        XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+
+                                                                    let s10 = Select(mid(t.a, start: 2, length: 3), from: t)
+                                                                    executeQuery(query: s10, connection: connection) { result, rows in
+                                                                        XCTAssertEqual(result.success, true, "SELECT failed")
+                                                                        XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                                                        XCTAssertNotNil(rows, "SELECT returned no rows")
+                                                                        XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
+                                                                        let sortedRows = rows!.map { String(describing: $0.first!!) }.sorted { $0 < $1 }
+                                                                        XCTAssertEqual(sortedRows, ["ana", "ana", "ana", "ppl", "ppl", "pri"], "SELECT returned wrong results")
+
+                                                                        let drop = Raw(query: "DROP TABLE", table: t)
+                                                                        executeQuery(query: drop, connection: connection) { result, rows in
+                                                                            XCTAssertEqual(result.success, true, "DROP TABLE failed")
+                                                                            XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+
+                                                                        }
                                                                     }
                                                                 }
                                                             }
