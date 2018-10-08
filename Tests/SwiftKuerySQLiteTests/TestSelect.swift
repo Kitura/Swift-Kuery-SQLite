@@ -215,7 +215,7 @@ class TestSelect: XCTestCase {
                                                                         executeQuery(query: drop, connection: connection) { result, rows in
                                                                             XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                                                             XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
-
+                                                                            semaphore.signal()
                                                                         }
                                                                     }
                                                                 }
