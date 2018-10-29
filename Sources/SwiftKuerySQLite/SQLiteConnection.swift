@@ -267,8 +267,7 @@ public class SQLiteConnection: Connection {
     /// Prepare statement.
     ///
     /// - Parameter query: The query to prepare statement for.
-    /// - Returns: The prepared statement.
-    /// - Throws: QueryError.syntaxError if query build fails, or a database error if it fails to prepare statement.
+    /// - Parameter onCompletion: The function to be called when the statementhas been prepared.
     public func prepareStatement(_ query: Query, onCompletion: @escaping ((PreparedStatement?, QueryError?) -> ())) {
         var sqliteQuery: String
         do {
@@ -283,8 +282,7 @@ public class SQLiteConnection: Connection {
     /// Prepare statement.
     ///
     /// - Parameter raw: A String with the query to prepare statement for.
-    /// - Returns: The prepared statement.
-    /// - Throws: QueryError.syntaxError if query build fails, or a database error if it fails to prepare statement.
+    /// - Parameter onCompletion: The function to be called when the statementhas been prepared.
     public func prepareStatement(_ raw: String, onCompletion: @escaping ((PreparedStatement?, QueryError?) -> ())) {
         DispatchQueue.global().async {
             var sqliteStatement: OpaquePointer? = nil
