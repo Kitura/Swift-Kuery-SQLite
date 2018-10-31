@@ -94,7 +94,7 @@ class TestSchema: XCTestCase {
                                 XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
                                 XCTAssertEqual(rows![0].count, 3, "SELECT returned wrong number of columns")
                                 XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
-                                XCTAssertEqual(rows![0][1]! as! Int32, 5, "Wrong value in row 0 column 1")
+                                XCTAssertEqual(rows![0][1]! as! sqliteInt, 5, "Wrong value in row 0 column 1")
                                 XCTAssertEqual(rows![0][2]! as! Double, 4.95, "Wrong value in row 0 column 2")
                                 
                                 var index = Index("\"index\"", on: t, columns: [tNew.a, desc(t.b)])
@@ -137,9 +137,9 @@ class TestSchema: XCTestCase {
                                                         XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
                                                         XCTAssertEqual(rows![0].count, 4, "SELECT returned wrong number of columns")
                                                         XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
-                                                        XCTAssertEqual(rows![0][1]! as! Int32, 5, "Wrong value in row 0 column 1")
+                                                        XCTAssertEqual(rows![0][1]! as! sqliteInt, 5, "Wrong value in row 0 column 1")
                                                         XCTAssertEqual(rows![0][2]! as! Double, 4.95, "Wrong value in row 0 column 2")
-                                                        XCTAssertEqual(rows![0][3]! as! Int32, 123, "Wrong value in row 0 column 3")
+                                                        XCTAssertEqual(rows![0][3]! as! sqliteInt, 123, "Wrong value in row 0 column 3")
                                                     }
                                                 }
                                             }
@@ -322,9 +322,9 @@ class TestSchema: XCTestCase {
                             XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
                             XCTAssertEqual(rows![0][1]! as! String, "passion fruit", "Wrong value in row 0 column 1")
                             XCTAssertEqual(rows![0][2]! as! String, "peach", "Wrong value in row 0 column 2")
-                            XCTAssertEqual(rows![0][3]! as! Int32, 123456789, "Wrong value in row 0 column 3")
-                            XCTAssertEqual(rows![0][4]! as! Int32, 123456789, "Wrong value in row 0 column 4")
-                            XCTAssertEqual(rows![0][5]! as! Int32, 123456789, "Wrong value in row 0 column 5")
+                            XCTAssertEqual(rows![0][3]! as! sqliteInt, 123456789, "Wrong value in row 0 column 3")
+                            XCTAssertEqual(rows![0][4]! as! sqliteInt, 123456789, "Wrong value in row 0 column 4")
+                            XCTAssertEqual(rows![0][5]! as! sqliteInt, 123456789, "Wrong value in row 0 column 5")
                             XCTAssertEqual(rows![0][6]! as! Double, -0.53, "Wrong value in row 0 column 6")
                             XCTAssertEqual(rows![0][7]! as! Double, 123.4567, "Wrong value in row 0 column 7")
                             XCTAssertEqual(rows![0][8]! as! String, "\(now)", "Wrong value in row 0 column 8")
@@ -435,9 +435,9 @@ class TestSchema: XCTestCase {
 
                                 XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows")
                                 XCTAssertEqual(rows![0].count, 1, "SELECT returned wrong number of columns")
-                                XCTAssertEqual(rows![0][0]! as? Int64, 2147483647, "Wrong value in row 0 column 0")
-                                XCTAssertEqual(rows![1][0]! as? Int64, 2147483648, "Wrong value in row 1 column 0")
-                                XCTAssertNotNil(rows![0][0]! as? Int32)
+                                XCTAssertEqual(rows![0][0]! as? sqliteInt, 2147483647, "Wrong value in row 0 column 0")
+                                XCTAssertEqual(rows![1][0]! as? sqliteInt, 2147483648, "Wrong value in row 1 column 0")
+                                XCTAssertNil(rows![0][0]! as? Int32)
                             }
                         }
                     }
