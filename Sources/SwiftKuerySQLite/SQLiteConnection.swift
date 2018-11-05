@@ -131,43 +131,35 @@ public class SQLiteConnection: Connection {
     /// Establish a connection with the database.
     ///
     /// - Parameter onCompletion: The function to be called when the connection is established.
-    public func connect(onCompletion: @escaping (QueryError?) -> ()) {
+    public func connect(onCompletion: @escaping (QueryResult) -> ()) {
         DispatchQueue.global().async {
             let resultCode = sqlite3_open(self.location.description, &self.connection)
-            var queryError: QueryError? = nil
             if resultCode != SQLITE_OK {
                 let error: String? = String(validatingUTF8: sqlite3_errmsg(self.connection))
-                queryError = QueryError.connection(error!)
                 self.connection = nil
+                return self.runCompletionHandler(.error(QueryError.connection(error!)), onCompletion: onCompletion)
             }
-            else {
-                // Set the busy timeout to 200 milliseconds.
-                sqlite3_busy_timeout(self.connection, 200)
-            }
-            guard queryError != nil else {
-                onCompletion(nil)
-                return
-            }
-            onCompletion(queryError)
+            // Set the busy timeout to 200 milliseconds.
+            sqlite3_busy_timeout(self.connection, 200)
+            return self.runCompletionHandler(.successNoData, onCompletion: onCompletion)
         }
     }
 
     /// Establish a connection with the database.
     ///
     /// - Returns: A QueryError if the connection cannot connect, otherwise nil
-    public func connectSync() -> QueryError? {
-        var error: QueryError?
+    public func connectSync() -> QueryResult {
+        var result: QueryResult? = nil
         let semaphore = DispatchSemaphore(value: 0)
-        connect { err in
-            error = err
+        connect() { res in
+            result = res
             semaphore.signal()
         }
         semaphore.wait()
-        guard let errorUnwrapped = error else {
-            // Everything worked
-            return nil
+        guard let resultUnwrapped = result else {
+            return .error(QueryError.connection("ConnectSync unexpetedly return a nil QueryResult"))
         }
-        return errorUnwrapped
+        return resultUnwrapped
     }
 
     /// Return a String representation of the query.
@@ -268,13 +260,12 @@ public class SQLiteConnection: Connection {
     ///
     /// - Parameter query: The query to prepare statement for.
     /// - Parameter onCompletion: The function to be called when the statementhas been prepared.
-    public func prepareStatement(_ query: Query, onCompletion: @escaping ((PreparedStatement?, QueryError?) -> ())) {
+    public func prepareStatement(_ query: Query, onCompletion: @escaping ((QueryResult) -> ())) {
         var sqliteQuery: String
         do {
             sqliteQuery = try query.build(queryBuilder: queryBuilder)
         } catch let error {
-            runCompletionHandler(nil, QueryError.syntaxError("Unable to prepare statement: \(error.localizedDescription)"), onCompletion: onCompletion)
-            return
+            return runCompletionHandler(.error(QueryError.syntaxError("Unable to prepare statement: \(error.localizedDescription)")), onCompletion: onCompletion)
         }
         prepareStatement(sqliteQuery, onCompletion: onCompletion)
     }
@@ -283,17 +274,16 @@ public class SQLiteConnection: Connection {
     ///
     /// - Parameter raw: A String with the query to prepare statement for.
     /// - Parameter onCompletion: The function to be called when the statementhas been prepared.
-    public func prepareStatement(_ raw: String, onCompletion: @escaping ((PreparedStatement?, QueryError?) -> ())) {
+    public func prepareStatement(_ raw: String, onCompletion: @escaping ((QueryResult) -> ())) {
         DispatchQueue.global().async {
             var sqliteStatement: OpaquePointer? = nil
             var sqlTail: UnsafePointer<Int8>? = nil
 
             let resultCode = sqlite3_prepare_v2(self.connection, raw, -1, &sqliteStatement, &sqlTail)
             guard let unwrappedSqliteStatement = sqliteStatement, resultCode == SQLITE_OK else {
-                self.runCompletionHandler(nil, QueryError.databaseError("Unable to prepare statement, error code: \(resultCode)"), onCompletion: onCompletion)
-                return
+                return self.runCompletionHandler(.error(QueryError.databaseError("Unable to prepare statement, error code: \(resultCode)")), onCompletion: onCompletion)
             }
-            self.runCompletionHandler(SQLitePreparedStatement(statement: unwrappedSqliteStatement), nil, onCompletion: onCompletion)
+            return self.runCompletionHandler(.success(SQLitePreparedStatement(statement: unwrappedSqliteStatement)), onCompletion: onCompletion)
         }
     }
 
@@ -353,17 +343,15 @@ public class SQLiteConnection: Connection {
     }
 
     private func execute(sqliteQuery: String, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
-        prepareStatement(sqliteQuery) { stmt, error in
-            guard let statement = stmt else {
-                if let error = error {
-                    self.runCompletionHandler(.error(QueryError.databaseError("\(error.localizedDescription)")), onCompletion: onCompletion)
-                    return
+        prepareStatement(sqliteQuery) { result in
+            guard let statement = result.asPreparedStatement else {
+                if let error = result.asError {
+                    return self.runCompletionHandler(.error(QueryError.databaseError("\(error.localizedDescription)")), onCompletion: onCompletion)
                 }
-                self.runCompletionHandler(.error(QueryError.databaseError("Unable to prepare statement")), onCompletion: onCompletion)
-                return
+                return self.runCompletionHandler(.error(QueryError.databaseError("Unable to prepare statement")), onCompletion: onCompletion)
             }
             let sqliteStatement = statement as! SQLitePreparedStatement
-            self.execute(sqliteStatement: sqliteStatement.statement, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+            return self.execute(sqliteStatement: sqliteStatement.statement, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
         }
     }
 
