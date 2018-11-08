@@ -340,14 +340,14 @@ class TestSchema: XCTestCase {
 
     class AutoIncrement1: Table {
         let a = Column("a", String.self, defaultValue: "qiwi")
-        let b = Column("b", Int32.self, autoIncrement: true, primaryKey: true)
+        let b = Column("b", Int64.self, autoIncrement: true, primaryKey: true)
 
         let tableName = "AutoIncrement1" + tableNameSuffix
     }
 
     class AutoIncrement2: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
-        let b = Column("b", Int32.self, autoIncrement: true)
+        let b = Column("b", Int64.self, autoIncrement: true)
 
         let tableName = "AutoIncrement2" + tableNameSuffix
     }

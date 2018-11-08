@@ -491,8 +491,8 @@ class SQLiteColumnBuilder: ColumnCreator {
             typeString += "(\(length))"
         }
         if column.autoIncrement {
-            if column.isPrimaryKey && typeString == "integer" {
-                result += typeString + " PRIMARY KEY" + " AUTOINCREMENT"
+            if column.isPrimaryKey && typeString == "bigint" {
+                result += "integer" + " PRIMARY KEY" + " AUTOINCREMENT"
             } else {
                 //SQLite only allows autoincrement on integer PRIMARY KEY columns so return nil
                 return nil
