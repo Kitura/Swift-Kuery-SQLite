@@ -34,6 +34,7 @@ class TestInsert: XCTestCase {
     static var allTests: [(String, (TestInsert) -> () throws -> Void)] {
         return [
             ("testInsert", testInsert),
+            ("testInsertID", testInsertID),
         ]
     }
     
