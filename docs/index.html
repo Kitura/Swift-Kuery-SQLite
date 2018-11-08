@@ -8,6 +8,9 @@
     <script src="js/jquery.min.js" defer></script>
     <script src="js/jazzy.js" defer></script>
     
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
   </head>
   <body>
 
@@ -20,6 +23,12 @@
           SwiftKuerySQLite Docs
         </a>
          (100% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
       </p>
     
         <p class="header-col header-col--secondary">
@@ -52,7 +61,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Enums/Location.html">Location</a>
@@ -60,7 +69,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/SQLitePreparedStatement.html">SQLitePreparedStatement</a>
@@ -74,40 +83,89 @@
         <section class="section">
           <div class="section-content">
             
-            <a href='#swift-kuery-sqlite' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h1 id='swift-kuery-sqlite'>Swift-Kuery-SQLite</h1>
+            <p align="center">
+    <a href="http://kitura.io/">
+        <img src="https://raw.githubusercontent.com/IBM-Swift/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
+    </a>
+</p>
 
-<p>SQLite plugin for the <a href="https://github.com/IBM-Swift/Swift-Kuery">Swift-Kuery</a> framework.</p>
-
-<p><a href="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite"><img src="https://travis-ci.org/IBM-Swift/Kitura.svg?branch=master" alt="Build Status - Master"></a>
-<img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
-<img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
-<img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2"></p>
-<a href='#summary' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='summary'>Summary</h2>
+<p align="center">
+    <a href="https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html">
+    <img src="https://img.shields.io/badge/apidoc-SwiftKuerySQLite-1FBCE4.svg?style=flat" alt="APIDoc">
+    </a>
+    <a href="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite">
+    <img src="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite.svg?branch=master" alt="Build Status - Master">
+    </a>
+    <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
+    <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
+    <img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
+    <a href="http://swift-at-ibm-slack.mybluemix.net/">
+    <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg" alt="Slack Status">
+    </a>
+</p>
+<h1 id='swift-kuery-sqlite' class='heading'>Swift-Kuery-SQLite</h1>
 
 <p><a href="https://sqlite.org/">SQLite</a> plugin for the <a href="https://github.com/IBM-Swift/Swift-Kuery">Swift-Kuery</a> framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.</p>
-<a href='#sqlite-installation' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='sqlite-installation'>SQLite installation</h2>
+<h2 id='sqlite-installation' class='heading'>SQLite installation</h2>
 
 <p>To use Swift-Kuery-SQLite you must install SQLite.</p>
-<a href='#macos' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='macos'>macOS</h3>
+<h3 id='macos' class='heading'>macOS</h3>
+
+<p>You can install SQLite with <a href="https://brew.sh/">Homebrew</a>:</p>
 <pre class="highlight plaintext"><code>$ brew install sqlite
 </code></pre>
-<a href='#linux' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='linux'>Linux</h3>
+
+<p>Or, if you prefer MacPorts, you can use that too, though note that you need to symlink a file into the place that Homebrew installs it:</p>
+<pre class="highlight plaintext"><code>$ port install sqlite3
+$ mkdir -p /usr/local/opt/sqlite/include
+$ ln -s /opt/local/include/sqlite3.h /usr/local/opt/sqlite/include/
+</code></pre>
+<h3 id='linux' class='heading'>Linux</h3>
 <pre class="highlight plaintext"><code>$ sudo apt-get install sqlite3 libsqlite3-dev
 </code></pre>
-<a href='#using-swift-kuery-sqlite' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='using-swift-kuery-sqlite'>Using Swift-Kuery-SQLite</h2>
+<h2 id='usage' class='heading'>Usage</h2>
+<h4 id='add-dependencies' class='heading'>Add dependencies</h4>
+
+<p>Add the <code>Swift-Kuery-SQLite</code> package to the dependencies within your application’s <code>Package.swift</code> file. Substitute <code>&quot;x.x.x&quot;</code> with the latest <code>Swift-Kuery-SQLite</code> <a href="https://github.com/IBM-Swift/Swift-Kuery-SQLite/releases">release</a>.</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/Swift-Kuery-SQLite.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"x.x.x"</span><span class="p">)</span>
+</code></pre>
+
+<p>Add <code>SwiftKuerySQLite</code> to your target&rsquo;s dependencies:</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">target</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"example"</span><span class="p">,</span> <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span><span class="s">"SwiftKuerySQLite"</span><span class="p">]),</span>
+</code></pre>
+<h4 id='import-package' class='heading'>Import package</h4>
+<pre class="highlight swift"><code>  <span class="kd">import</span> <span class="kt">SwiftKuerySQLite</span>
+</code></pre>
+<h2 id='using-swift-kuery-sqlite' class='heading'>Using Swift-Kuery-SQLite</h2>
 
 <p>First create an instance of <code>Swift-Kuery-SQLite</code> by calling:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">db</span> <span class="o">=</span> <span class="kt">SQLiteConnection</span><span class="p">(</span><span class="nv">filename</span><span class="p">:</span> <span class="s">"myDB.db"</span><span class="p">)</span>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">connection</span> <span class="o">=</span> <span class="kt">SQLiteConnection</span><span class="p">(</span><span class="nv">filename</span><span class="p">:</span> <span class="s">"myDB.db"</span><span class="p">)</span>
 </code></pre>
+
+<p>You don&rsquo;t have to pass a filename, if you choose not to pass in a filename then your database will be in-memory.</p>
 
 <p>To establish a connection call:</p>
-<pre class="highlight swift"><code><span class="n">db</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">onCompletion</span><span class="p">:</span> <span class="p">(</span><span class="kt">QueryError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">())</span>
+<pre class="highlight swift"><code><span class="n">connection</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">onCompletion</span><span class="p">:</span> <span class="p">(</span><span class="kt">QueryError</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">())</span>
 </code></pre>
 
-<p>You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the <a href="https://github.com/IBM-Swift/Swift-Kuery">Kuery</a> documentation for more information.</p>
-<a href='#license' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='license'>License</h2>
+<p>If you want to have multiple connections to your database you can create a <code>ConnectionPool</code> as follows:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">pool</span> <span class="o">=</span> <span class="kt">SQLiteConnection</span><span class="o">.</span><span class="nf">createPool</span><span class="p">(</span><span class="nv">filename</span><span class="p">:</span> <span class="s">"myDB.db"</span><span class="p">,</span> <span class="nv">poolOptions</span><span class="p">:</span> <span class="kt">ConnectionPoolOptions</span><span class="p">(</span><span class="nv">initialCapacity</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nv">maxCapacity</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="nv">timeout</span><span class="p">:</span> <span class="mi">10000</span><span class="p">))</span>
 
-<p>This library is licensed under Apache 2.0. Full license text is available in <a href="LICENSE.txt">LICENSE</a>.</p>
+<span class="k">let</span> <span class="nv">connection</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nf">getConnection</span><span class="p">()</span>
+</code></pre>
+
+<p>Note, you don&rsquo;t have to pass a filename to the <code>createPool</code> method, if you choose not to pass in a filename then your pool will be shared in-memory.</p>
+
+<p>You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the <a href="https://github.com/IBM-Swift/Swift-Kuery">Kuery</a> documentation for more information, or see the <a href="https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html">Database Connectivity with Kuery</a> chapter of the <em><a href="https://www.gitbook.com/book/nocturnalsolutions/kitura-book">Kitura Until Dawn</a></em> guidebook/tutorial.</p>
+<h2 id='api-documentation' class='heading'>API Documentation</h2>
+
+<p>For more information visit our <a href="https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html">API reference</a>.</p>
+<h2 id='community' class='heading'>Community</h2>
+
+<p>We love to talk server-side Swift, and Kitura. Join our <a href="http://swift-at-ibm-slack.mybluemix.net/">Slack</a> to meet the team!</p>
+<h2 id='license' class='heading'>License</h2>
+
+<p>This library is licensed under Apache 2.0. Full license text is available in <a href="https://github.com/IBM-Swift/Swift-Kuery-SQLite/blob/master/LICENSE">LICENSE</a>.</p>
 
           </div>
         </section>
@@ -116,8 +174,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-06-01)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.0</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2018 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2018-06-29)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
