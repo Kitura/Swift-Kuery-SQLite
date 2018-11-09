@@ -41,7 +41,7 @@ class TestSchema: XCTestCase {
     
     class MyTable: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi", collate: "BINARY")
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         let c = Column("c", Double.self, defaultValue: 4.95, check: "c > 0")
         
         let tableName = "MyTable" + tableNameSuffix
@@ -49,16 +49,23 @@ class TestSchema: XCTestCase {
     
     class MyNewTable: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         let c = Column("c", Double.self, defaultValue: 4.95)
-        let d = Column("d", Int32.self, defaultValue: 123)
+        let d = Column("d", Int64.self, defaultValue: 123)
         
         let tableName = "MyNewTable" + tableNameSuffix
+    }
+
+    class invalidTable: Table {
+        let a = Column("a", Int32.self)
+
+        let tableName = "invalidTable" + tableNameSuffix
     }
 
     func testCreateTable() {
         let t = MyTable()
         let tNew = MyNewTable()
+        let tInvalid = invalidTable()
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
@@ -69,77 +76,83 @@ class TestSchema: XCTestCase {
             }
             cleanUp(table: t.tableName, connection: connection) { result in
                 cleanUp(table: tNew.tableName, connection: connection) { result in
-                    
-                    t.create(connection: connection) { result in
-                        XCTAssertEqual(result.success, true, "CREATE TABLE failed")
-                        XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
-                        
-                        let i1 = Insert(into: t, valueTuples: (t.a, "apple"), (t.b, 5))
-                        executeQuery(query: i1, connection: connection) { result, rows in
-                            XCTAssertEqual(result.success, true, "INSERT failed")
-                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
-                            
-                            let s1 = Select(from: t)
-                            executeQuery(query: s1, connection: connection) { result, rows in
-                                XCTAssertEqual(result.success, true, "SELECT failed")
-                                XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
-                                XCTAssertNotNil(rows, "SELECT returned no rows")
-                                
-                                let resultSet = result.asResultSet!
-                                XCTAssertEqual(resultSet.titles.count, 3, "SELECT returned wrong number of titles")
-                                XCTAssertEqual(resultSet.titles[0], "a", "Wrong column name for column 0")
-                                XCTAssertEqual(resultSet.titles[1], "b", "Wrong column name for column 1")
-                                XCTAssertEqual(resultSet.titles[2], "c", "Wrong column name for column 2")
-                                
-                                XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
-                                XCTAssertEqual(rows![0].count, 3, "SELECT returned wrong number of columns")
-                                XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
-                                XCTAssertEqual(rows![0][1]! as? Int32, 5, "Wrong value in row 0 column 1")
-                                XCTAssertEqual(rows![0][2]! as? Double, 4.95, "Wrong value in row 0 column 2")
-                                
-                                var index = Index("\"index\"", on: t, columns: [tNew.a, desc(t.b)])
-                                index.create(connection: connection) { result in
-                                    XCTAssertEqual(result.success, false, "CREATE INDEX should fail")
-                                    XCTAssertNotNil(result.asError, "CREATE INDEX should return an error")
-                                    XCTAssertEqual("\(result.asError!)", "Index contains columns that do not belong to its table.")
-                                    
-                                    index = Index("\"index\"", on: t, columns: [t.a, desc(t.b)])
+                    cleanUp(table: tInvalid.tableName, connection: connection) { result in
+
+                        t.create(connection: connection) { result in
+                            XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                            XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
+
+                            let i1 = Insert(into: t, valueTuples: (t.a, "apple"), (t.b, 5))
+                            executeQuery(query: i1, connection: connection) { result, rows in
+                                XCTAssertEqual(result.success, true, "INSERT failed")
+                                XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                                let s1 = Select(from: t)
+                                executeQuery(query: s1, connection: connection) { result, rows in
+                                    XCTAssertEqual(result.success, true, "SELECT failed")
+                                    XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                    XCTAssertNotNil(rows, "SELECT returned no rows")
+
+                                    let resultSet = result.asResultSet!
+                                    XCTAssertEqual(resultSet.titles.count, 3, "SELECT returned wrong number of titles")
+                                    XCTAssertEqual(resultSet.titles[0], "a", "Wrong column name for column 0")
+                                    XCTAssertEqual(resultSet.titles[1], "b", "Wrong column name for column 1")
+                                    XCTAssertEqual(resultSet.titles[2], "c", "Wrong column name for column 2")
+
+                                    XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
+                                    XCTAssertEqual(rows![0].count, 3, "SELECT returned wrong number of columns")
+                                    XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
+                                    XCTAssertEqual(rows![0][1]! as? Int64, 5, "Wrong value in row 0 column 1")
+                                    XCTAssertEqual(rows![0][2]! as? Double, 4.95, "Wrong value in row 0 column 2")
+
+                                    var index = Index("\"index\"", on: t, columns: [tNew.a, desc(t.b)])
                                     index.create(connection: connection) { result in
-                                        XCTAssertEqual(result.success, true, "CREATE INDEX failed")
-                                        XCTAssertNil(result.asError, "Error in CREATE INDEX: \(result.asError!)")
-                                        
-                                        index.drop(connection: connection) { result in
-                                            XCTAssertEqual(result.success, true, "DROP INDEX failed")
-                                            XCTAssertNil(result.asError, "Error in DROP INDEX: \(result.asError!)")
-                                            
-                                            let migration = Migration(from: t, to: tNew, using: connection)
-                                            migration.alterTableName() { result in
-                                                XCTAssertEqual(result.success, true, "Migration failed")
-                                                XCTAssertNil(result.asError, "Error in Migration: \(result.asError!)")
-                                                
-                                                migration.alterTableAdd(column: tNew.d) { result in
+                                        XCTAssertEqual(result.success, false, "CREATE INDEX should fail")
+                                        XCTAssertNotNil(result.asError, "CREATE INDEX should return an error")
+                                        XCTAssertEqual("\(result.asError!)", "Index contains columns that do not belong to its table.")
+
+                                        index = Index("\"index\"", on: t, columns: [t.a, desc(t.b)])
+                                        index.create(connection: connection) { result in
+                                            XCTAssertEqual(result.success, true, "CREATE INDEX failed")
+                                            XCTAssertNil(result.asError, "Error in CREATE INDEX: \(result.asError!)")
+
+                                            index.drop(connection: connection) { result in
+                                                XCTAssertEqual(result.success, true, "DROP INDEX failed")
+                                                XCTAssertNil(result.asError, "Error in DROP INDEX: \(result.asError!)")
+
+                                                let migration = Migration(from: t, to: tNew, using: connection)
+                                                migration.alterTableName() { result in
                                                     XCTAssertEqual(result.success, true, "Migration failed")
                                                     XCTAssertNil(result.asError, "Error in Migration: \(result.asError!)")
-                                                    
-                                                    let s2 = Select(from: tNew)
-                                                    executeQuery(query: s2, connection: connection) { result, rows in
-                                                        XCTAssertEqual(result.success, true, "SELECT failed")
-                                                        XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
-                                                        XCTAssertNotNil(rows, "SELECT returned no rows")
-                                                        
-                                                        let resultSet = result.asResultSet!
-                                                        XCTAssertEqual(resultSet.titles.count, 4, "SELECT returned wrong number of titles")
-                                                        XCTAssertEqual(resultSet.titles[0], "a", "Wrong column name for column 0")
-                                                        XCTAssertEqual(resultSet.titles[1], "b", "Wrong column name for column 1")
-                                                        XCTAssertEqual(resultSet.titles[2], "c", "Wrong column name for column 2")
-                                                        XCTAssertEqual(resultSet.titles[3], "d", "Wrong column name for column 3")
-                                                        
-                                                        XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
-                                                        XCTAssertEqual(rows![0].count, 4, "SELECT returned wrong number of columns")
-                                                        XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
-                                                        XCTAssertEqual(rows![0][1]! as? Int32, 5, "Wrong value in row 0 column 1")
-                                                        XCTAssertEqual(rows![0][2]! as? Double, 4.95, "Wrong value in row 0 column 2")
-                                                        XCTAssertEqual(rows![0][3]! as? Int32, 123, "Wrong value in row 0 column 3")
+
+                                                    migration.alterTableAdd(column: tNew.d) { result in
+                                                        XCTAssertEqual(result.success, true, "Migration failed")
+                                                        XCTAssertNil(result.asError, "Error in Migration: \(result.asError!)")
+
+                                                        let s2 = Select(from: tNew)
+                                                        executeQuery(query: s2, connection: connection) { result, rows in
+                                                            XCTAssertEqual(result.success, true, "SELECT failed")
+                                                            XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                                            XCTAssertNotNil(rows, "SELECT returned no rows")
+
+                                                            let resultSet = result.asResultSet!
+                                                            XCTAssertEqual(resultSet.titles.count, 4, "SELECT returned wrong number of titles")
+                                                            XCTAssertEqual(resultSet.titles[0], "a", "Wrong column name for column 0")
+                                                            XCTAssertEqual(resultSet.titles[1], "b", "Wrong column name for column 1")
+                                                            XCTAssertEqual(resultSet.titles[2], "c", "Wrong column name for column 2")
+                                                            XCTAssertEqual(resultSet.titles[3], "d", "Wrong column name for column 3")
+
+                                                            XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
+                                                            XCTAssertEqual(rows![0].count, 4, "SELECT returned wrong number of columns")
+                                                            XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
+                                                            XCTAssertEqual(rows![0][1]! as? Int64, 5, "Wrong value in row 0 column 1")
+                                                            XCTAssertEqual(rows![0][2]! as? Double, 4.95, "Wrong value in row 0 column 2")
+                                                            XCTAssertEqual(rows![0][3]! as? Int64, 123, "Wrong value in row 0 column 3")
+
+                                                            tInvalid.create(connection: connection) { result in
+                                                                XCTAssertEqual(result.success, false, "Invalid table created")
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -157,7 +170,7 @@ class TestSchema: XCTestCase {
     
     class Table1: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
-        let b = Column("b", Int32.self, primaryKey: true)
+        let b = Column("b", Int64.self, primaryKey: true)
         let c = Column("c", Double.self, defaultValue: 4.95)
         
         let tableName = "Table1" + tableNameSuffix
@@ -165,18 +178,18 @@ class TestSchema: XCTestCase {
     
     class Table2: Table {
         let a = Column("a", String.self, primaryKey: true, defaultValue: "qiwi")
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         let c = Column("c", Double.self, defaultValue: 4.95)
-        let d = Column("d", Int32.self, defaultValue: 123)
+        let d = Column("d", Int64.self, defaultValue: 123)
         
         let tableName = "Table2" + tableNameSuffix
     }
     
     class Table3: Table {
         let a = Column("a", String.self, defaultValue: "qiwi")
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         let c = Column("c", Double.self, defaultValue: 4.95)
-        let d = Column("d", Int32.self, defaultValue: 123)
+        let d = Column("d", Int64.self, defaultValue: 123)
         
         let tableName = "Table3" + tableNameSuffix
     }
@@ -222,7 +235,7 @@ class TestSchema: XCTestCase {
     
     class Table4: Table {
         let a = Column("a", String.self)
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         let c = Column("c", Double.self)
         
         let tableName = "Table4" + tableNameSuffix
@@ -230,7 +243,7 @@ class TestSchema: XCTestCase {
     
     class Table5: Table {
         let e = Column("e", String.self, primaryKey: true)
-        let f = Column("f", Int32.self)
+        let f = Column("f", Int64.self)
         
         let tableName = "Table5" + tableNameSuffix
     }
@@ -273,7 +286,7 @@ class TestSchema: XCTestCase {
         let c = Column("c", Char.self, length: 10)
         
         let d = Column("d", Int16.self)
-        let e = Column("e", Int32.self)
+        //let e = Column("e", Int32.self)
         let f = Column("f", Int64.self)
         
         let g = Column("g", Float.self)
@@ -306,7 +319,7 @@ class TestSchema: XCTestCase {
                     
                     let now = Date()
                     
-                    let i1 = Insert(into: t, values: "apple", "passion fruit", "peach", 123456789, 123456789, 123456789, -0.53, 123.4567, now, now, now)
+                    let i1 = Insert(into: t, values: "apple", "passion fruit", "peach", 123456789, 123456789, -0.53, 123.4567, now, now, now)
                     executeQuery(query: i1, connection: connection) { result, rows in
                         XCTAssertEqual(result.success, true, "INSERT failed")
                         XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
@@ -318,18 +331,17 @@ class TestSchema: XCTestCase {
                             XCTAssertNotNil(rows, "SELECT returned no rows")
                             
                             XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
-                            XCTAssertEqual(rows![0].count, 11, "SELECT returned wrong number of columns")
+                            XCTAssertEqual(rows![0].count, 10, "SELECT returned wrong number of columns")
                             XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
                             XCTAssertEqual(rows![0][1]! as? String, "passion fruit", "Wrong value in row 0 column 1")
                             XCTAssertEqual(rows![0][2]! as? String, "peach", "Wrong value in row 0 column 2")
-                            XCTAssertEqual(rows![0][3]! as? sqliteInt, 123456789, "Wrong value in row 0 column 3")
-                            XCTAssertEqual(rows![0][4]! as? Int32, 123456789, "Wrong value in row 0 column 4")
-                            XCTAssertEqual(rows![0][5]! as? Int64, 123456789, "Wrong value in row 0 column 5")
-                            XCTAssertEqual(rows![0][6]! as? Double, -0.53, "Wrong value in row 0 column 6")
-                            XCTAssertEqual(rows![0][7]! as? Double, 123.4567, "Wrong value in row 0 column 7")
-                            XCTAssertEqual(rows![0][8]! as? String, "\(now)", "Wrong value in row 0 column 8")
-                            XCTAssertEqual(rows![0][9]! as? String, "\(now)", "Wrong value in row 0 column 9")
-                            XCTAssertEqual(rows![0][10]! as? String, "\(now)", "Wrong value in row 0 column 10")
+                            XCTAssertEqual(rows![0][3]! as? Int64, 123456789, "Wrong value in row 0 column 3")
+                            XCTAssertEqual(rows![0][4]! as? Int64, 123456789, "Wrong value in row 0 column 5")
+                            XCTAssertEqual(rows![0][5]! as? Double, -0.53, "Wrong value in row 0 column 6")
+                            XCTAssertEqual(rows![0][6]! as? Double, 123.4567, "Wrong value in row 0 column 7")
+                            XCTAssertEqual(rows![0][7]! as? String, "\(now)", "Wrong value in row 0 column 8")
+                            XCTAssertEqual(rows![0][8]! as? String, "\(now)", "Wrong value in row 0 column 9")
+                            XCTAssertEqual(rows![0][9]! as? String, "\(now)", "Wrong value in row 0 column 10")
                         }
                     }
                 }
@@ -435,8 +447,8 @@ class TestSchema: XCTestCase {
 
                                 XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows")
                                 XCTAssertEqual(rows![0].count, 1, "SELECT returned wrong number of columns")
-                                XCTAssertEqual(rows![0][0]! as? sqliteInt, 2147483647, "Wrong value in row 0 column 0")
-                                XCTAssertEqual(rows![1][0]! as? sqliteInt, 2147483648, "Wrong value in row 1 column 0")
+                                XCTAssertEqual(rows![0][0]! as? Int64, 2147483647, "Wrong value in row 0 column 0")
+                                XCTAssertEqual(rows![1][0]! as? Int64, 2147483648, "Wrong value in row 1 column 0")
                                 XCTAssertNil(rows![0][0]! as? Int32)
                             }
                         }
