@@ -285,7 +285,7 @@ class TestSchema: XCTestCase {
         let b = Column("b", Varchar.self, length: 10)
         let c = Column("c", Char.self, length: 10)
         
-        let d = Column("d", Int16.self)
+        //let d = Column("d", Int16.self)
         //let e = Column("e", Int32.self)
         let f = Column("f", Int64.self)
         
@@ -319,7 +319,7 @@ class TestSchema: XCTestCase {
                     
                     let now = Date()
                     
-                    let i1 = Insert(into: t, values: "apple", "passion fruit", "peach", 123456789, 123456789, -0.53, 123.4567, now, now, now)
+                    let i1 = Insert(into: t, values: "apple", "passion fruit", "peach", 123456789, -0.53, 123.4567, now, now, now)
                     executeQuery(query: i1, connection: connection) { result, rows in
                         XCTAssertEqual(result.success, true, "INSERT failed")
                         XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
@@ -331,17 +331,16 @@ class TestSchema: XCTestCase {
                             XCTAssertNotNil(rows, "SELECT returned no rows")
                             
                             XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
-                            XCTAssertEqual(rows![0].count, 10, "SELECT returned wrong number of columns")
+                            XCTAssertEqual(rows![0].count, 9, "SELECT returned wrong number of columns")
                             XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
                             XCTAssertEqual(rows![0][1]! as? String, "passion fruit", "Wrong value in row 0 column 1")
                             XCTAssertEqual(rows![0][2]! as? String, "peach", "Wrong value in row 0 column 2")
                             XCTAssertEqual(rows![0][3]! as? Int64, 123456789, "Wrong value in row 0 column 3")
-                            XCTAssertEqual(rows![0][4]! as? Int64, 123456789, "Wrong value in row 0 column 5")
-                            XCTAssertEqual(rows![0][5]! as? Double, -0.53, "Wrong value in row 0 column 6")
-                            XCTAssertEqual(rows![0][6]! as? Double, 123.4567, "Wrong value in row 0 column 7")
-                            XCTAssertEqual(rows![0][7]! as? String, "\(now)", "Wrong value in row 0 column 8")
-                            XCTAssertEqual(rows![0][8]! as? String, "\(now)", "Wrong value in row 0 column 9")
-                            XCTAssertEqual(rows![0][9]! as? String, "\(now)", "Wrong value in row 0 column 10")
+                            XCTAssertEqual(rows![0][4]! as? Double, -0.53, "Wrong value in row 0 column 4")
+                            XCTAssertEqual(rows![0][5]! as? Double, 123.4567, "Wrong value in row 0 column 5")
+                            XCTAssertEqual(rows![0][6]! as? String, "\(now)", "Wrong value in row 0 column 6")
+                            XCTAssertEqual(rows![0][7]! as? String, "\(now)", "Wrong value in row 0 column 7")
+                            XCTAssertEqual(rows![0][8]! as? String, "\(now)", "Wrong value in row 0 column 8")
                         }
                     }
                 }
