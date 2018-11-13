@@ -249,10 +249,10 @@ public class SQLiteConnection: Connection {
             execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
         }
         catch QueryError.syntaxError(let error) {
-            onCompletion(.error(QueryError.syntaxError(error)))
+            return runCompletionHandler(.error(QueryError.syntaxError(error)), onCompletion: onCompletion)
         }
         catch {
-            onCompletion(.error(QueryError.syntaxError("Failed to build the query")))
+            return runCompletionHandler(.error(QueryError.syntaxError("Failed to build the query")), onCompletion: onCompletion)
         }
     }
 
@@ -321,8 +321,7 @@ public class SQLiteConnection: Connection {
 
     private func execute(preparedStatement: PreparedStatement, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
         guard let statement = preparedStatement as? SQLitePreparedStatement else {
-            onCompletion(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")))
-            return
+            return runCompletionHandler(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")), onCompletion: onCompletion)
         }
         execute(sqliteStatement: statement.statement, parameters: parameters, namedParameters: namedParameters, finalize: false, onCompletion: onCompletion)
     }
@@ -334,11 +333,10 @@ public class SQLiteConnection: Connection {
     public func release(preparedStatement: PreparedStatement, onCompletion: @escaping ((QueryResult) -> ())) {
         DispatchQueue.global().async {
             guard let statement = preparedStatement as? SQLitePreparedStatement else {
-                onCompletion(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")))
-                return
+                return self.runCompletionHandler(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")), onCompletion: onCompletion)
             }
             sqlite3_finalize(statement.statement)
-            onCompletion(.successNoData)
+            return self.runCompletionHandler(.successNoData, onCompletion: onCompletion)
         }
     }
 
@@ -363,8 +361,7 @@ public class SQLiteConnection: Connection {
         for (i, parameter) in parameters.enumerated() {
             if let error = bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement) {
                 Utils.clear(statement: sqliteStatement, finalize: finalize)
-                onCompletion(.error(error))
-                return
+                return runCompletionHandler(.error(error), onCompletion: onCompletion)
             }
         }
 
@@ -373,8 +370,7 @@ public class SQLiteConnection: Connection {
             let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
             if let error = bind(parameter: parameter, at: index, statement: sqliteStatement) {
                 Utils.clear(statement: sqliteStatement, finalize: finalize)
-                onCompletion(.error(error))
-                return
+                return runCompletionHandler(.error(error), onCompletion: onCompletion)
             }
         }
 
@@ -383,17 +379,16 @@ public class SQLiteConnection: Connection {
         switch executionResultCode {
         case SQLITE_DONE:
             Utils.clear(statement: sqliteStatement, finalize: finalize)
-            onCompletion(.successNoData)
+            return runCompletionHandler(.successNoData, onCompletion: onCompletion)
         case SQLITE_ROW:
-            onCompletion(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize))))
+            return runCompletionHandler(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize))), onCompletion: onCompletion)
         default:
             var errorMessage = "Failed to execute the query."
             if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement)) {
                 errorMessage += " Error: \(error)"
             }
             Utils.clear(statement: sqliteStatement, finalize: finalize)
-            //By offloading this to another thread the current connection context expires and connection will be returned to the pool.
-            onCompletion(.error(QueryError.databaseError(errorMessage)))
+            return runCompletionHandler(.error(QueryError.databaseError(errorMessage)), onCompletion: onCompletion)
         }
     }
 
@@ -491,8 +486,7 @@ public class SQLiteConnection: Connection {
     private func executeTransaction(command: String, inTransaction: Bool, changeTransactionState: Bool, errorMessage: String, onCompletion: @escaping ((QueryResult) -> ())) {
         guard self.inTransaction == inTransaction else {
             let error = self.inTransaction ? "Transaction already exists" : "No transaction exists"
-            onCompletion(.error(QueryError.transactionError(error)))
-            return
+            return runCompletionHandler(.error(QueryError.transactionError(error)), onCompletion: onCompletion)
         }
         
         var sqliteError: UnsafeMutablePointer<Int8>?
@@ -502,14 +496,13 @@ public class SQLiteConnection: Connection {
             if let sqliteError = sqliteError {
                 error += ". Error\(String(cString: sqliteError))."
             }
-            onCompletion(.error(QueryError.databaseError(error)))
+            return runCompletionHandler(.error(QueryError.databaseError(error)), onCompletion: onCompletion)
         }
         else {
             if changeTransactionState {
                 self.inTransaction = !self.inTransaction
             }
-
-            onCompletion(.successNoData)
+            return runCompletionHandler(.successNoData, onCompletion: onCompletion)
         }
     }
 }
