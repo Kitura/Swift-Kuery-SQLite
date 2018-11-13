@@ -381,7 +381,7 @@ public class SQLiteConnection: Connection {
             Utils.clear(statement: sqliteStatement, finalize: finalize)
             return runCompletionHandler(.successNoData, onCompletion: onCompletion)
         case SQLITE_ROW:
-            return runCompletionHandler(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize))), onCompletion: onCompletion)
+            return runCompletionHandler(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize), connection: self)), onCompletion: onCompletion)
         default:
             var errorMessage = "Failed to execute the query."
             if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement)) {
