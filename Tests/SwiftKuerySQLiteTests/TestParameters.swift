@@ -16,7 +16,6 @@
 
 import XCTest
 import SwiftKuery
-import Dispatch
 
 @testable import SwiftKuerySQLite
 
@@ -49,8 +48,6 @@ class TestParameters: XCTestCase {
         
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
-
-            let semaphore = DispatchSemaphore(value: 0)
             
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -123,7 +120,7 @@ class TestParameters: XCTestCase {
                                                     let s2 = Select(from: t).where(t.a != Parameter())
                                                     executeQueryWithParameters(query: s2, connection: connection, parameters: nil) { result, rows in
                                                         XCTAssertEqual(result.success, true, "SELECT failed")
-                                                        semaphore.signal()
+                                                        expectation.fulfill()
                                                     }
                                                 }
                                             }
@@ -135,8 +132,6 @@ class TestParameters: XCTestCase {
                     }
                 }
             }
-            semaphore.wait()
-            expectation.fulfill()
         })
     }
     
@@ -152,8 +147,6 @@ class TestParameters: XCTestCase {
 
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
-
-            let semaphore = DispatchSemaphore(value: 0)
 
             guard let connection = pool.getConnection() else {
                 XCTFail("Failed to get connection")
@@ -173,7 +166,7 @@ class TestParameters: XCTestCase {
                                 XCTFail("Unable to prepare statement preparedInsert: \(error.localizedDescription)")
                             }
                             XCTFail("Unable to prepare statement preparedInsert")
-                            semaphore.signal()
+                            expectation.fulfill()
                             return
                         }
 
@@ -188,7 +181,7 @@ class TestParameters: XCTestCase {
                                         XCTFail("Unable to prepare statement preparedSelect: \(error.localizedDescription)")
                                     }
                                     XCTFail("Unable to prepare statement preparedSelect")
-                                    semaphore.signal()
+                                    expectation.fulfill()
                                     return
                                 }
 
@@ -211,7 +204,7 @@ class TestParameters: XCTestCase {
                                                     XCTFail("Unable to prepare statement preparedSelect2: \(error.localizedDescription)")
                                                 }
                                                 XCTFail("Unable to prepare statement preparedSelect2")
-                                                semaphore.signal()
+                                                expectation.fulfill()
                                                 return
                                             }
 
@@ -229,7 +222,7 @@ class TestParameters: XCTestCase {
 
                                                         connection.release(preparedStatement: preparedSelect2) { result in
                                                             XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
-                                                            semaphore.signal()
+                                                            expectation.fulfill()
                                                         }
                                                     }
                                                 }
@@ -242,9 +235,6 @@ class TestParameters: XCTestCase {
                     }
                 }
             }
-            semaphore.wait()
-            expectation.fulfill()
         })
     }
-    
 }
