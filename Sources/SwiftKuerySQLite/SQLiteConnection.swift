@@ -184,9 +184,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: The query to execute.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(query: query, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(query: query, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a raw query.
@@ -194,9 +192,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter query: A String with the query to execute.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a query with parameters.
@@ -205,9 +201,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, parameters: [Any?], onCompletion: (@escaping (QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(query: query, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(query: query, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a raw query with parameters.
@@ -216,9 +210,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, parameters: [Any?], onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(sqliteQuery: raw, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(sqliteQuery: raw, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a query with parameters.
@@ -227,9 +219,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(query: Query, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(query: query, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
-        }
+        execute(query: query, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
     }
 
     /// Execute a raw query with parameters.
@@ -238,9 +228,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution of the query has completed.
     public func execute(_ raw: String, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
-        }
+        execute(sqliteQuery: raw, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
     }
 
     private func execute(query: Query, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
@@ -292,9 +280,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter preparedStatement: The prepared statement to execute.
     /// - Parameter onCompletion: The function to be called when the execution has completed.
     public func execute(preparedStatement: PreparedStatement, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a prepared statement with parameters.
@@ -303,9 +289,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: An array of the parameters.
     /// - Parameter onCompletion: The function to be called when the execution has completed.
     public func execute(preparedStatement: PreparedStatement, parameters: [Any?], onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(preparedStatement: preparedStatement, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
-        }
+        execute(preparedStatement: preparedStatement, parameters: parameters, namedParameters: [String:Any?](), onCompletion: onCompletion)
     }
 
     /// Execute a prepared statement with parameters.
@@ -314,9 +298,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter parameters: A dictionary of the parameters with parameter names as the keys.
     /// - Parameter onCompletion: The function to be called when the execution has completed.
     public func execute(preparedStatement: PreparedStatement, parameters: [String:Any?], onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
-        }
+        execute(preparedStatement: preparedStatement, parameters: [Any?](), namedParameters: parameters, onCompletion: onCompletion)
     }
 
     private func execute(preparedStatement: PreparedStatement, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
@@ -331,10 +313,10 @@ public class SQLiteConnection: Connection {
     /// - Parameter preparedStatement: The prepared statement to release.
     /// - Parameter onCompletion: The function to be called when the execution has completed.
     public func release(preparedStatement: PreparedStatement, onCompletion: @escaping ((QueryResult) -> ())) {
+        guard let statement = preparedStatement as? SQLitePreparedStatement else {
+            return self.runCompletionHandler(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")), onCompletion: onCompletion)
+        }
         DispatchQueue.global().async {
-            guard let statement = preparedStatement as? SQLitePreparedStatement else {
-                return self.runCompletionHandler(.error(QueryError.unsupported("Failed to execute unsupported prepared statement")), onCompletion: onCompletion)
-            }
             sqlite3_finalize(statement.statement)
             return self.runCompletionHandler(.successNoData, onCompletion: onCompletion)
         }
@@ -354,41 +336,43 @@ public class SQLiteConnection: Connection {
     }
 
     private func execute(sqliteStatement: OpaquePointer, parameters: [Any?], namedParameters: [String:Any?], finalize: Bool = true, onCompletion: (@escaping (QueryResult) -> ())) {
-        // Bind parameters: either numbered parameters or named parameters can be passed,
-        // mixing of both types of parameters in one query is not supported
-        
-        // Numbered parameters
-        for (i, parameter) in parameters.enumerated() {
-            if let error = bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement) {
-                Utils.clear(statement: sqliteStatement, finalize: finalize)
-                return runCompletionHandler(.error(error), onCompletion: onCompletion)
-            }
-        }
+        DispatchQueue.global().async {
+            // Bind parameters: either numbered parameters or named parameters can be passed,
+            // mixing of both types of parameters in one query is not supported
 
-        // Named parameters
-        for (name, parameter) in namedParameters {
-            let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
-            if let error = bind(parameter: parameter, at: index, statement: sqliteStatement) {
-                Utils.clear(statement: sqliteStatement, finalize: finalize)
-                return runCompletionHandler(.error(error), onCompletion: onCompletion)
+            // Numbered parameters
+            for (i, parameter) in parameters.enumerated() {
+                if let error = self.bind(parameter: parameter, at: Int32(i + 1), statement: sqliteStatement) {
+                    Utils.clear(statement: sqliteStatement, finalize: finalize)
+                    return self.runCompletionHandler(.error(error), onCompletion: onCompletion)
+                }
             }
-        }
 
-        // Execute and get result
-        let executionResultCode = sqlite3_step(sqliteStatement)
-        switch executionResultCode {
-        case SQLITE_DONE:
-            Utils.clear(statement: sqliteStatement, finalize: finalize)
-            return runCompletionHandler(.successNoData, onCompletion: onCompletion)
-        case SQLITE_ROW:
-            return runCompletionHandler(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize), connection: self)), onCompletion: onCompletion)
-        default:
-            var errorMessage = "Failed to execute the query."
-            if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement)) {
-                errorMessage += " Error: \(error)"
+            // Named parameters
+            for (name, parameter) in namedParameters {
+                let index = sqlite3_bind_parameter_index(sqliteStatement, "@"+name)
+                if let error = self.bind(parameter: parameter, at: index, statement: sqliteStatement) {
+                    Utils.clear(statement: sqliteStatement, finalize: finalize)
+                    return self.runCompletionHandler(.error(error), onCompletion: onCompletion)
+                }
             }
-            Utils.clear(statement: sqliteStatement, finalize: finalize)
-            return runCompletionHandler(.error(QueryError.databaseError(errorMessage)), onCompletion: onCompletion)
+
+            // Execute and get result
+            let executionResultCode = sqlite3_step(sqliteStatement)
+            switch executionResultCode {
+            case SQLITE_DONE:
+                Utils.clear(statement: sqliteStatement, finalize: finalize)
+                return self.runCompletionHandler(.successNoData, onCompletion: onCompletion)
+            case SQLITE_ROW:
+                return self.runCompletionHandler(.resultSet(ResultSet(SQLiteResultFetcher(sqliteStatement: sqliteStatement, finalize: finalize), connection: self)), onCompletion: onCompletion)
+            default:
+                var errorMessage = "Failed to execute the query."
+                if let error = String(validatingUTF8: sqlite3_errmsg(sqliteStatement)) {
+                    errorMessage += " Error: \(error)"
+                }
+                Utils.clear(statement: sqliteStatement, finalize: finalize)
+                return self.runCompletionHandler(.error(QueryError.databaseError(errorMessage)), onCompletion: onCompletion)
+            }
         }
     }
 
@@ -430,27 +414,21 @@ public class SQLiteConnection: Connection {
     ///
     /// - Parameter onCompletion: The function to be called when the execution of start transaction command has completed.
     public func startTransaction(onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "BEGIN TRANSACTION", inTransaction: false, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "BEGIN TRANSACTION", inTransaction: false, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
     }
 
     /// Commit the current transaction.
     ///
     /// - Parameter onCompletion: The function to be called when the execution of commit transaction command has completed.
     public func commit(onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "END TRANSACTION", inTransaction: true, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "END TRANSACTION", inTransaction: true, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
     }
 
     /// Rollback the current transaction.
     ///
     /// - Parameter onCompletion: The function to be called when the execution of rolback transaction command has completed.
     public func rollback(onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "ROLLBACK", inTransaction: true, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "ROLLBACK", inTransaction: true, changeTransactionState: true, errorMessage: "Failed to rollback the transaction", onCompletion: onCompletion)
     }
 
     /// Create a savepoint.
@@ -458,9 +436,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter savepoint: The name to  be given to the created savepoint.
     /// - Parameter onCompletion: The function to be called when the execution of create savepoint command has completed.
     public func create(savepoint: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "SAVEPOINT \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to create the savepoint \(savepoint)", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "SAVEPOINT \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to create the savepoint \(savepoint)", onCompletion: onCompletion)
     }
 
     /// Rollback the current transaction to the specified savepoint.
@@ -468,9 +444,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter to savepoint: The name of the savepoint to rollback to.
     /// - Parameter onCompletion: The function to be called when the execution of rolback transaction command has completed.
     public func rollback(to savepoint: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "ROLLBACK TO \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to rollback to the savepoint \(savepoint)", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "ROLLBACK TO \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to rollback to the savepoint \(savepoint)", onCompletion: onCompletion)
     }
 
     /// Release a savepoint.
@@ -478,9 +452,7 @@ public class SQLiteConnection: Connection {
     /// - Parameter savepoint: The name of the savepoint to release.
     /// - Parameter onCompletion: The function to be called when the execution of release savepoint command has completed.
     public func release(savepoint: String, onCompletion: @escaping ((QueryResult) -> ())) {
-        DispatchQueue.global().async {
-            self.executeTransaction(command: "RELEASE SAVEPOINT \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to release the savepoint \(savepoint)", onCompletion: onCompletion)
-        }
+        executeTransaction(command: "RELEASE SAVEPOINT \(savepoint)", inTransaction: true, changeTransactionState: false, errorMessage: "Failed to release the savepoint \(savepoint)", onCompletion: onCompletion)
     }
 
     private func executeTransaction(command: String, inTransaction: Bool, changeTransactionState: Bool, errorMessage: String, onCompletion: @escaping ((QueryResult) -> ())) {
@@ -489,20 +461,22 @@ public class SQLiteConnection: Connection {
             return runCompletionHandler(.error(QueryError.transactionError(error)), onCompletion: onCompletion)
         }
         
-        var sqliteError: UnsafeMutablePointer<Int8>?
-        let resultCode = sqlite3_exec(connection, command, nil, nil, &sqliteError)
-        if resultCode != SQLITE_OK {
-            var error = errorMessage
-            if let sqliteError = sqliteError {
-                error += ". Error\(String(cString: sqliteError))."
+        DispatchQueue.global().async {
+            var sqliteError: UnsafeMutablePointer<Int8>?
+            let resultCode = sqlite3_exec(self.connection, command, nil, nil, &sqliteError)
+            if resultCode != SQLITE_OK {
+                var error = errorMessage
+                if let sqliteError = sqliteError {
+                    error += ". Error\(String(cString: sqliteError))."
+                }
+                return self.runCompletionHandler(.error(QueryError.databaseError(error)), onCompletion: onCompletion)
             }
-            return runCompletionHandler(.error(QueryError.databaseError(error)), onCompletion: onCompletion)
-        }
-        else {
-            if changeTransactionState {
-                self.inTransaction = !self.inTransaction
+            else {
+                if changeTransactionState {
+                    self.inTransaction = !self.inTransaction
+                }
+                return self.runCompletionHandler(.successNoData, onCompletion: onCompletion)
             }
-            return runCompletionHandler(.successNoData, onCompletion: onCompletion)
         }
     }
 }
