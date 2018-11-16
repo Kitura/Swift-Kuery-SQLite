@@ -1,9 +1,4 @@
-# Travis CI build file for Swift-Kuery-SQLite.
-# Swift-Kuery-SQLite runs on OS X and Linux (Ubuntu).
-# See the following URLs for further details on Travis CI
-# https://docs.travis-ci.com/user/customizing-the-build/
-# https://docs.travis-ci.com/user/docker/
-# https://docs.travis-ci.com/user/multi-os/
+# Travis CI build file.
 
 # whitelist (branches that should be built)
 branches:
@@ -28,6 +23,16 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
+    - os: linux
+      dist: trusty
+      sudo: required
+      services: docker
+      env: DOCKER_IMAGE=ubuntu:16.04 DOCKER_PACKAGES="libsqlite3-dev"
+    - os: linux
+      dist: trusty
+      sudo: required
+      services: docker
+      env: DOCKER_IMAGE=ubuntu:18.04 DOCKER_PACKAGES="libsqlite3-dev"
     - os: osx
       osx_image: xcode9.2
       sudo: required
