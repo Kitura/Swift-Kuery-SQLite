@@ -45,118 +45,119 @@ class TestSubquery: XCTestCase {
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
 
-            guard let connection = pool.getConnection() else {
-                XCTFail("Failed to get connection")
-                return
-            }
-            
-            cleanUp(table: t.tableName, connection: connection) { result in
-                
-                executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
-                    XCTAssertEqual(result.success, true, "CREATE TABLE failed")
-                    XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
-                    
-                    let i1 = Insert(into: t, rows: [["apple", 10], ["apricot", 3], ["banana", 17], ["apple", 17], ["banana", -7], ["banana", 27]])
-                    executeQuery(query: i1, connection: connection) { result, rows in
-                        XCTAssertEqual(result.success, true, "INSERT failed")
-                        XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
-                        
-                        var s = Select(from: t)
-                            .where(t.b == any(Select(t.b, from: t).where(t.b == 17)))
-                        executeQuery(query: s, connection: connection) { result, rows in
-                            XCTAssertEqual(result.success, false, "SELECT with ANY didn't fail")
-                            XCTAssertNotNil(result.asError, "SELECT with ANY didn't fail")
-                            XCTAssertEqual("\(result.asError!)", "ANY on subquery is not supported. ", "Wrong error")
-                            
-                            s = Select(t.a, from: t)
-                                .group(by: t.a)
-                                .having(sum(t.b) > any(Select(t.b, from: t).where(t.b == 27)))
+            pool.getConnection { connection, error in
+                guard let connection = connection else {
+                    XCTFail("Failed to get connection")
+                    return
+                }
+                cleanUp(table: t.tableName, connection: connection) { result in
+
+                    executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a varchar(40), b integer)", connection: connection) { result, rows in
+                        XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                        XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
+
+                        let i1 = Insert(into: t, rows: [["apple", 10], ["apricot", 3], ["banana", 17], ["apple", 17], ["banana", -7], ["banana", 27]])
+                        executeQuery(query: i1, connection: connection) { result, rows in
+                            XCTAssertEqual(result.success, true, "INSERT failed")
+                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                            var s = Select(from: t)
+                                .where(t.b == any(Select(t.b, from: t).where(t.b == 17)))
                             executeQuery(query: s, connection: connection) { result, rows in
                                 XCTAssertEqual(result.success, false, "SELECT with ANY didn't fail")
                                 XCTAssertNotNil(result.asError, "SELECT with ANY didn't fail")
                                 XCTAssertEqual("\(result.asError!)", "ANY on subquery is not supported. ", "Wrong error")
-                                
-                                s = Select(from: t)
-                                    .where(t.b > all(Select(t.b, from: t).where(t.b == 3)))
+
+                                s = Select(t.a, from: t)
+                                    .group(by: t.a)
+                                    .having(sum(t.b) > any(Select(t.b, from: t).where(t.b == 27)))
                                 executeQuery(query: s, connection: connection) { result, rows in
-                                    XCTAssertEqual(result.success, true, "SELECT failed")
-                                    XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
-                                    XCTAssertNotNil(rows, "SELECT returned no rows")
-                                    XCTAssertEqual(rows!.count, 4, "SELECT returned wrong number of rows: \(rows!.count) instead of 4")
-                                    
+                                    XCTAssertEqual(result.success, false, "SELECT with ANY didn't fail")
+                                    XCTAssertNotNil(result.asError, "SELECT with ANY didn't fail")
+                                    XCTAssertEqual("\(result.asError!)", "ANY on subquery is not supported. ", "Wrong error")
+
                                     s = Select(from: t)
-                                        .where(t.b > (Select(t.b, from: t).where(t.b == 3)))
+                                        .where(t.b > all(Select(t.b, from: t).where(t.b == 3)))
                                     executeQuery(query: s, connection: connection) { result, rows in
                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                         XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                         XCTAssertNotNil(rows, "SELECT returned no rows")
                                         XCTAssertEqual(rows!.count, 4, "SELECT returned wrong number of rows: \(rows!.count) instead of 4")
-                                        
+
                                         s = Select(from: t)
-                                            .where(exists(Select(t.b, from: t).where(t.b == 10)))
+                                            .where(t.b > (Select(t.b, from: t).where(t.b == 3)))
                                         executeQuery(query: s, connection: connection) { result, rows in
                                             XCTAssertEqual(result.success, true, "SELECT failed")
                                             XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                             XCTAssertNotNil(rows, "SELECT returned no rows")
-                                            XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                            
+                                            XCTAssertEqual(rows!.count, 4, "SELECT returned wrong number of rows: \(rows!.count) instead of 4")
+
                                             s = Select(from: t)
-                                                .where(8.in(1,6,8))
+                                                .where(exists(Select(t.b, from: t).where(t.b == 10)))
                                             executeQuery(query: s, connection: connection) { result, rows in
                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                 XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                 XCTAssertNotNil(rows, "SELECT returned no rows")
                                                 XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                
+
                                                 s = Select(from: t)
-                                                    .having("apple".notIn("plum"))
-                                                    .group(by: t.a, t.b)
+                                                    .where(8.in(1,6,8))
                                                 executeQuery(query: s, connection: connection) { result, rows in
                                                     XCTAssertEqual(result.success, true, "SELECT failed")
                                                     XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
                                                     XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                    
+
                                                     s = Select(from: t)
-                                                        .where((-7).in(Select(t.b, from: t).where(t.b == -1)))
+                                                        .having("apple".notIn("plum"))
+                                                        .group(by: t.a, t.b)
                                                     executeQuery(query: s, connection: connection) { result, rows in
                                                         XCTAssertEqual(result.success, true, "SELECT failed")
-                                                        XCTAssertNil(result.asResultSet, "SELECT should not return any rows")
-                                                        
+                                                        XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                                        XCTAssertNotNil(rows, "SELECT returned no rows")
+                                                        XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
+
                                                         s = Select(from: t)
-                                                            .group(by: t.a, t.b)
-                                                            .having(exists(Select(t.b, from: t).where(t.b == 17)))
+                                                            .where((-7).in(Select(t.b, from: t).where(t.b == -1)))
                                                         executeQuery(query: s, connection: connection) { result, rows in
                                                             XCTAssertEqual(result.success, true, "SELECT failed")
-                                                            XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
-                                                            XCTAssertNotNil(rows, "SELECT returned no rows")
-                                                            XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                            
+                                                            XCTAssertNil(result.asResultSet, "SELECT should not return any rows")
+
                                                             s = Select(from: t)
-                                                                .where(notExists(Select(t.b, from: t).where(t.b == 8)))
+                                                                .group(by: t.a, t.b)
+                                                                .having(exists(Select(t.b, from: t).where(t.b == 17)))
                                                             executeQuery(query: s, connection: connection) { result, rows in
                                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                                 XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                 XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                 XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                                
+
                                                                 s = Select(from: t)
-                                                                    .where(false.notIn(Parameter(), Parameter()))
-                                                                executeQueryWithParameters(query: s, connection: connection, parameters: 1, 1) { result, rows in
+                                                                    .where(notExists(Select(t.b, from: t).where(t.b == 8)))
+                                                                executeQuery(query: s, connection: connection) { result, rows in
                                                                     XCTAssertEqual(result.success, true, "SELECT failed")
                                                                     XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                     XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                                    
+
                                                                     s = Select(from: t)
-                                                                        .group(by: t.a, t.b)
-                                                                        .having(Parameter().in(Parameter(), Parameter()))
-                                                                    executeQueryWithParameters(query: s, connection: connection, parameters: 1, 1, 0) { result, rows in
+                                                                        .where(false.notIn(Parameter(), Parameter()))
+                                                                    executeQueryWithParameters(query: s, connection: connection, parameters: 1, 1) { result, rows in
                                                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                                                         XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                         XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                         XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
-                                                                        expectation.fulfill()
+
+                                                                        s = Select(from: t)
+                                                                            .group(by: t.a, t.b)
+                                                                            .having(Parameter().in(Parameter(), Parameter()))
+                                                                        executeQueryWithParameters(query: s, connection: connection, parameters: 1, 1, 0) { result, rows in
+                                                                            XCTAssertEqual(result.success, true, "SELECT failed")
+                                                                            XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                                                            XCTAssertNotNil(rows, "SELECT returned no rows")
+                                                                            XCTAssertEqual(rows!.count, 6, "SELECT returned wrong number of rows: \(rows!.count) instead of 6")
+                                                                            expectation.fulfill()
+                                                                        }
                                                                     }
                                                                 }
                                                             }
