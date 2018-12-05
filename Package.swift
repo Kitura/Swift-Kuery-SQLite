@@ -29,8 +29,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("issue_async") ),
-        //.package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("next")),
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("next")),
     ],
     targets: [
         .target(
