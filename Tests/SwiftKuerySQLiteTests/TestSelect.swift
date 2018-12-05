@@ -177,6 +177,7 @@ class TestSelect: XCTestCase {
 
                                                             let s7 = Select(from: t)
                                                                 .where(t.a.in("apple", "lalala"))
+                                                            executeQuery(query: s7, connection: connection) { result, rows in
                                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                                 XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                 XCTAssertNotNil(rows, "SELECT returned no rows")

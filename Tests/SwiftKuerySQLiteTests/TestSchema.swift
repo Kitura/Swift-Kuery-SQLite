@@ -415,44 +415,46 @@ class TestSchema: XCTestCase {
         let pool = CommonUtils.sharedInstance.getConnectionPool()
         performTest(asyncTasks: { expectation in
 
-            guard let connection = pool.getConnection() else {
-                XCTFail("Failed to get connection")
-                return
-            }
-
-            cleanUp(table: i64.tableName, connection: connection) { result in
-                i64.create(connection: connection) { result in
-                    XCTAssertEqual(result.success, true, "CREATE TABLE failed for \(i64.tableName)")
-                    XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
-
-                    let insert = Insert(into: i64, values: INT32_MAX)
-                    executeQuery(query: insert, connection: connection) { result, rows in
-                        XCTAssertEqual(result.success, true, "INSERT failed")
+            pool.getConnection { connection, error in
+                guard let connection = connection else {
+                    XCTFail("Failed to get connection")
+                    return
+                }
+                cleanUp(table: i64.tableName, connection: connection) { result in
+                    i64.create(connection: connection) { result in
+                        XCTAssertEqual(result.success, true, "CREATE TABLE failed for \(i64.tableName)")
                         XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
 
-                        let overflow: Int64 = Int64(INT32_MAX)
-                        let insert2 = Insert(into: i64, values: overflow + 1)
-                        executeQuery(query: insert2, connection: connection) { result, rows in
+                        let insert = Insert(into: i64, values: INT32_MAX)
+                        executeQuery(query: insert, connection: connection) { result, rows in
                             XCTAssertEqual(result.success, true, "INSERT failed")
                             XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
 
-                            let select = Select(from: i64)
-                            executeQuery(query: select, connection: connection) { result, rows in
-                                XCTAssertEqual(result.success, true, "SELECT failed")
-                                XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
-                                XCTAssertNotNil(rows, "SELECT returned no rows")
+                            let overflow: Int64 = Int64(INT32_MAX)
+                            let insert2 = Insert(into: i64, values: overflow + 1)
+                            executeQuery(query: insert2, connection: connection) { result, rows in
+                                XCTAssertEqual(result.success, true, "INSERT failed")
+                                XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
 
-                                XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows")
-                                XCTAssertEqual(rows![0].count, 1, "SELECT returned wrong number of columns")
-                                XCTAssertEqual(rows![0][0]! as? sqliteInt, 2147483647, "Wrong value in row 0 column 0")
-                                XCTAssertEqual(rows![1][0]! as? sqliteInt, 2147483648, "Wrong value in row 1 column 0")
-                                XCTAssertNil(rows![0][0]! as? Int32)
+                                let select = Select(from: i64)
+                                executeQuery(query: select, connection: connection) { result, rows in
+                                    XCTAssertEqual(result.success, true, "SELECT failed")
+                                    XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                    XCTAssertNotNil(rows, "SELECT returned no rows")
+
+                                    XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows")
+                                    XCTAssertEqual(rows![0].count, 1, "SELECT returned wrong number of columns")
+                                    XCTAssertEqual(rows![0][0]! as? sqliteInt, 2147483647, "Wrong value in row 0 column 0")
+                                    XCTAssertEqual(rows![1][0]! as? sqliteInt, 2147483648, "Wrong value in row 1 column 0")
+                                    XCTAssertNil(rows![0][0]! as? Int32)
+
+                                    expectation.fulfill()
+                                }
                             }
                         }
                     }
                 }
             }
-            expectation.fulfill()
         })
     }
 }
