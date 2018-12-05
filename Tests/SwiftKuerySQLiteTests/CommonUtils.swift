@@ -26,6 +26,8 @@ import Foundation
 import SwiftKuery
 import SwiftKuerySQLite
 
+typealias sqliteInt = Int64
+
 func read(fileName: String) -> String {
     // Read in a configuration file into an NSData
     do {

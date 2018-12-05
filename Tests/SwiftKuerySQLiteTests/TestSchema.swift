@@ -35,6 +35,7 @@ class TestSchema: XCTestCase {
             ("testPrimaryKeys", testPrimaryKeys),
             ("testTypes", testTypes),
             ("testAutoIncrement", testAutoIncrement),
+            ("testInt64", testInt64),
         ]
     }
     
@@ -54,8 +55,7 @@ class TestSchema: XCTestCase {
         
         let tableName = "MyNewTable" + tableNameSuffix
     }
-    
-    
+
     func testCreateTable() {
         let t = MyTable()
         let tNew = MyNewTable()
@@ -95,7 +95,7 @@ class TestSchema: XCTestCase {
                                     XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
                                     XCTAssertEqual(rows![0].count, 3, "SELECT returned wrong number of columns")
                                     XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
-                                    XCTAssertEqual(rows![0][1]! as! Int32, 5, "Wrong value in row 0 column 1")
+                                    XCTAssertEqual(rows![0][1]! as! sqliteInt, 5, "Wrong value in row 0 column 1")
                                     XCTAssertEqual(rows![0][2]! as! Double, 4.95, "Wrong value in row 0 column 2")
 
                                     var index = Index("\"index\"", on: t, columns: [tNew.a, desc(t.b)])
@@ -138,9 +138,9 @@ class TestSchema: XCTestCase {
                                                             XCTAssertEqual(rows!.count, 1, "SELECT returned wrong number of rows")
                                                             XCTAssertEqual(rows![0].count, 4, "SELECT returned wrong number of columns")
                                                             XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
-                                                            XCTAssertEqual(rows![0][1]! as! Int32, 5, "Wrong value in row 0 column 1")
+                                                            XCTAssertEqual(rows![0][1]! as! sqliteInt, 5, "Wrong value in row 0 column 1")
                                                             XCTAssertEqual(rows![0][2]! as! Double, 4.95, "Wrong value in row 0 column 2")
-                                                            XCTAssertEqual(rows![0][3]! as! Int32, 123, "Wrong value in row 0 column 3")
+                                                            XCTAssertEqual(rows![0][3]! as! sqliteInt, 123, "Wrong value in row 0 column 3")
                                                             expectation.fulfill()
                                                         }
                                                     }
@@ -327,9 +327,9 @@ class TestSchema: XCTestCase {
                                 XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
                                 XCTAssertEqual(rows![0][1]! as! String, "passion fruit", "Wrong value in row 0 column 1")
                                 XCTAssertEqual(rows![0][2]! as! String, "peach", "Wrong value in row 0 column 2")
-                                XCTAssertEqual(rows![0][3]! as! Int32, 123456789, "Wrong value in row 0 column 3")
-                                XCTAssertEqual(rows![0][4]! as! Int32, 123456789, "Wrong value in row 0 column 4")
-                                XCTAssertEqual(rows![0][5]! as! Int32, 123456789, "Wrong value in row 0 column 5")
+                                XCTAssertEqual(rows![0][3]! as! sqliteInt, 123456789, "Wrong value in row 0 column 3")
+                                XCTAssertEqual(rows![0][4]! as! sqliteInt, 123456789, "Wrong value in row 0 column 4")
+                                XCTAssertEqual(rows![0][5]! as! sqliteInt, 123456789, "Wrong value in row 0 column 5")
                                 XCTAssertEqual(rows![0][6]! as! Double, -0.53, "Wrong value in row 0 column 6")
                                 XCTAssertEqual(rows![0][7]! as! Double, 123.4567, "Wrong value in row 0 column 7")
                                 XCTAssertEqual(rows![0][8]! as! String, "\(now)", "Wrong value in row 0 column 8")
@@ -399,6 +399,60 @@ class TestSchema: XCTestCase {
                     }
                 }
             }
+        })
+    }
+
+    class int64Table: Table {
+        let int64 = Column("int64", Int64.self)
+
+        let tableName = "int64Table" + tableNameSuffix
+    }
+
+    func testInt64() {
+
+        let i64 = int64Table()
+
+        let pool = CommonUtils.sharedInstance.getConnectionPool()
+        performTest(asyncTasks: { expectation in
+
+            guard let connection = pool.getConnection() else {
+                XCTFail("Failed to get connection")
+                return
+            }
+
+            cleanUp(table: i64.tableName, connection: connection) { result in
+                i64.create(connection: connection) { result in
+                    XCTAssertEqual(result.success, true, "CREATE TABLE failed for \(i64.tableName)")
+                    XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                    let insert = Insert(into: i64, values: INT32_MAX)
+                    executeQuery(query: insert, connection: connection) { result, rows in
+                        XCTAssertEqual(result.success, true, "INSERT failed")
+                        XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                        let overflow: Int64 = Int64(INT32_MAX)
+                        let insert2 = Insert(into: i64, values: overflow + 1)
+                        executeQuery(query: insert2, connection: connection) { result, rows in
+                            XCTAssertEqual(result.success, true, "INSERT failed")
+                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                            let select = Select(from: i64)
+                            executeQuery(query: select, connection: connection) { result, rows in
+                                XCTAssertEqual(result.success, true, "SELECT failed")
+                                XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
+                                XCTAssertNotNil(rows, "SELECT returned no rows")
+
+                                XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows")
+                                XCTAssertEqual(rows![0].count, 1, "SELECT returned wrong number of columns")
+                                XCTAssertEqual(rows![0][0]! as? sqliteInt, 2147483647, "Wrong value in row 0 column 0")
+                                XCTAssertEqual(rows![1][0]! as? sqliteInt, 2147483648, "Wrong value in row 1 column 0")
+                                XCTAssertNil(rows![0][0]! as? Int32)
+                            }
+                        }
+                    }
+                }
+            }
+            expectation.fulfill()
         })
     }
 }

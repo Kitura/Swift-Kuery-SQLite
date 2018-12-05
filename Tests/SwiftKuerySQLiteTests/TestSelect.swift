@@ -108,6 +108,7 @@ class TestSelect: XCTestCase {
                                         XCTAssertEqual(result.success, true, "SELECT failed")
                                         XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                         let resultSet = result.asResultSet!
+
                                         XCTAssertNotNil(rows, "SELECT returned no rows")
                                         XCTAssertEqual(rows!.count, 4, "SELECT returned wrong number of rows: \(rows!.count) instead of 4")
                                         XCTAssertEqual(resultSet.titles[0], "b", "Wrong column name: \(resultSet.titles[0]) instead of b")
@@ -139,6 +140,7 @@ class TestSelect: XCTestCase {
                                                 XCTAssertNotNil(rows, "SELECT returned no rows")
                                                 let resultSet = result.asResultSet!
                                                 XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows: \(rows!.count) instead of 2")
+
                                                 XCTAssertEqual(resultSet.titles[0], "raw", "Wrong column name: \(resultSet.titles[0]) instead of raw")
                                                 XCTAssertEqual(rows![0][0]! as! String, "ba", "Wrong value in row 0 column 0")
                                                 XCTAssertEqual(rows![1][0]! as! String, "ap", "Wrong value in row 1 column 0")
@@ -175,7 +177,6 @@ class TestSelect: XCTestCase {
 
                                                             let s7 = Select(from: t)
                                                                 .where(t.a.in("apple", "lalala"))
-                                                            executeQuery(query: s7, connection: connection) { result, rows in
                                                                 XCTAssertEqual(result.success, true, "SELECT failed")
                                                                 XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                 XCTAssertNotNil(rows, "SELECT returned no rows")
@@ -189,7 +190,7 @@ class TestSelect: XCTestCase {
                                                                     XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
                                                                     XCTAssertEqual(rows!.count, 2, "SELECT returned wrong number of rows: \(rows!.count) instead of 2")
-                                                                    XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
+                                                                    XCTAssertEqual(rows![0][0]! as? String, "apple", "Wrong value in row 0 column 0")
 
                                                                     let s9 = "Select * from \"\(t.tableName)\" where a IN ('apple', 'lalala')"
                                                                     executeRawQuery(s9, connection: connection) { result, rows in

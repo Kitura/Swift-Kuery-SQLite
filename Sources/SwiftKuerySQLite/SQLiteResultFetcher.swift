@@ -104,7 +104,7 @@ public class SQLiteResultFetcher: ResultFetcher {
             var value: Any?
             switch sqlite3_column_type(sqliteStatement, i) {
             case SQLITE_INTEGER:
-                value = sqlite3_column_int(sqliteStatement, i)
+                value = sqlite3_column_int64(sqliteStatement, i)
             case SQLITE_FLOAT:
                 value = sqlite3_column_double(sqliteStatement, i)
             case SQLITE_TEXT:

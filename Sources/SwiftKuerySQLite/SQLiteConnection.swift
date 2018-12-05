@@ -234,7 +234,20 @@ public class SQLiteConnection: Connection {
     private func execute(query: Query, parameters: [Any?], namedParameters: [String:Any?], onCompletion: (@escaping (QueryResult) -> ())) {
         do {
             let sqliteQuery = try query.build(queryBuilder: queryBuilder)
-            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters, onCompletion: onCompletion)
+
+            execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters) { queryResult in
+              if let insertQuery = query as? Insert, insertQuery.returnID {
+                guard let idColumn = insertQuery.table.columns.first(where: {$0.isPrimaryKey && $0.autoIncrement}) else {
+                  onCompletion(.error(QueryError.syntaxError("Failed to find the ID column name")))
+                  return
+                }
+                self.execute(sqliteQuery: "Select last_insert_rowid() as \(idColumn.name);", parameters: [Any?](), namedParameters: [:]) { queryResult in
+                  onCompletion(queryResult)
+                }
+              } else {
+                onCompletion(queryResult)
+              }
+            }
         }
         catch QueryError.syntaxError(let error) {
             return runCompletionHandler(.error(QueryError.syntaxError(error)), onCompletion: onCompletion)
