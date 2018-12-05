@@ -53,6 +53,8 @@ public class SQLiteResultFetcher: ResultFetcher {
         done()
     }
 
+    /// Indicate no further calls will be made to this ResultFetcher allowing the connection in use to be released.
+    ///
     public func done() {
         if hasMoreRows {
             Utils.clear(statement: sqliteStatement, finalize: finalize)
