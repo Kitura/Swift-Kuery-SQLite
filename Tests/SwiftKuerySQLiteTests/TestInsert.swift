@@ -166,19 +166,27 @@ class TestInsert: XCTestCase {
                         XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
                         let i7 = Insert(into: t3, valueTuples: [(t3.b, 5)], returnID: true)
                         executeQuery(query: i7, connection: connection) { result, rows in
+                            guard let resultSet = result.asResultSet, let rows = rows else {
+                                XCTFail("No resultSet or Rows when both expected")
+                                return
+                            }
                             XCTAssertEqual(result.success, true, "INSERT failed")
                             XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
                             XCTAssertNotNil(result.asResultSet, "INSERT returned no rows")
                             XCTAssertNotNil(rows, "INSERT returned no rows")
-                            if let resultSet = result.asResultSet, let rows = rows {
-                                XCTAssertEqual(resultSet.titles.count, 1, "Wrong number of columns: \(resultSet.titles.count) instead of 1")
-                                XCTAssertEqual(rows.count, 1, "INSERT returned wrong number of rows: \(rows.count) instead of 1")
-                            }
+                            XCTAssertEqual(rows.count, 1, "INSERT returned wrong number of rows: \(rows.count) instead of 1")
+                            resultSet.getColumnTitles() { titles, error in
+                                guard let titles = titles else {
+                                    XCTFail("No titles returned")
+                                    return
+                                }
+                                XCTAssertEqual(titles.count, 1, "Wrong number of columns: \(titles.count) instead of 1")
 
-                            let dropT3 = Raw(query: "DROP TABLE", table: t3)
-                            executeQuery(query: dropT3, connection: connection) { result, rows in
-                                XCTAssertEqual(result.success, true, "DROP TABLE failed")
-                                XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                let dropT3 = Raw(query: "DROP TABLE", table: t3)
+                                executeQuery(query: dropT3, connection: connection) { result, rows in
+                                    XCTAssertEqual(result.success, true, "DROP TABLE failed")
+                                    XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                }
                             }
                         }
                     }
