@@ -21,6 +21,7 @@ import SwiftKuery
     import CSQLiteDarwin
 #endif
 import Foundation
+import Dispatch
 
 // MARK: SQLiteResultFetcher
 
