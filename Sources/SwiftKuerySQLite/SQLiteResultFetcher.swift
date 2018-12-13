@@ -86,9 +86,9 @@ public class SQLiteResultFetcher: ResultFetcher {
         }
     }
     
-    /// Fetch the titles of the query result. This function is blocking.
+    /// Fetch the titles of the query result. This function is non-blocking.
     ///
-    /// - Parameter callback: A callback to call passing an array of column titles of type String.
+    /// - Parameter callback: A callback to call passing an array containing column titles of type String.
     public func fetchTitles(callback: @escaping (([String]?, Error?)) -> ()) {
         // As titles is already populated when this ResultFetcher is initialised we can simply return without blocking or offload.
         callback((titles, nil))
