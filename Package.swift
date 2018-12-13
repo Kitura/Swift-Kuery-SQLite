@@ -29,7 +29,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("next")),
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("issue_remove_timeout")),
     ],
     targets: [
         .target(
