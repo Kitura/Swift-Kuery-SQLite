@@ -188,42 +188,46 @@ class TestParameters: XCTestCase {
 
                                     connection.execute(preparedStatement: preparedSelect, parameters: ["fruit":"apple"]) { result in
                                         XCTAssertEqual(result.success, true, "SELECT failed")
-                                        let rows = result.asRows
-                                        XCTAssertNotNil(rows, "SELECT returned no rows")
-                                        XCTAssertEqual(rows!.count, 1, "Wrong number of rows")
-
-                                        connection.execute(preparedStatement: preparedSelect, parameters: ["fruit":"banana"]) { result in
-                                            XCTAssertEqual(result.success, true, "SELECT failed")
-                                            let rows = result.asRows
+                                        //let rows = result.asRows
+                                        result.asRows() { rows, error in
                                             XCTAssertNotNil(rows, "SELECT returned no rows")
-                                            XCTAssertEqual(rows!.count, 2, "Wrong number of rows")
+                                            XCTAssertEqual(rows!.count, 1, "Wrong number of rows")
 
-                                            let s2 = "SELECT * FROM " + t.tableName
-                                            connection.prepareStatement(s2) { result in
-                                                guard let preparedSelect2 = result.asPreparedStatement else {
-                                                    if let error = result.asError {
-                                                        XCTFail("Unable to prepare statement preparedSelect2: \(error.localizedDescription)")
-                                                    }
-                                                    XCTFail("Unable to prepare statement preparedSelect2")
-                                                    expectation.fulfill()
-                                                    return
-                                                }
-
-                                                connection.execute(preparedStatement: preparedSelect2) { result in
-                                                    XCTAssertEqual(result.success, true, "SELECT failed")
-                                                    let rows = result.asRows
+                                            connection.execute(preparedStatement: preparedSelect, parameters: ["fruit":"banana"]) { result in
+                                                XCTAssertEqual(result.success, true, "SELECT failed")
+                                                result.asRows() { rows, error in
                                                     XCTAssertNotNil(rows, "SELECT returned no rows")
-                                                    XCTAssertEqual(rows!.count, 3, "Wrong number of rows")
+                                                    XCTAssertEqual(rows!.count, 2, "Wrong number of rows")
 
-                                                    connection.release(preparedStatement: preparedInsert) { result in
-                                                        XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                    let s2 = "SELECT * FROM " + t.tableName
+                                                    connection.prepareStatement(s2) { result in
+                                                        guard let preparedSelect2 = result.asPreparedStatement else {
+                                                            if let error = result.asError {
+                                                                XCTFail("Unable to prepare statement preparedSelect2: \(error.localizedDescription)")
+                                                            }
+                                                            XCTFail("Unable to prepare statement preparedSelect2")
+                                                            expectation.fulfill()
+                                                            return
+                                                        }
 
-                                                        connection.release(preparedStatement: preparedSelect) { result in
-                                                            XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                        connection.execute(preparedStatement: preparedSelect2) { result in
+                                                            XCTAssertEqual(result.success, true, "SELECT failed")
+                                                            result.asRows() { rows, error in
+                                                                XCTAssertNotNil(rows, "SELECT returned no rows")
+                                                                XCTAssertEqual(rows!.count, 3, "Wrong number of rows")
 
-                                                            connection.release(preparedStatement: preparedSelect2) { result in
-                                                                XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
-                                                                expectation.fulfill()
+                                                                connection.release(preparedStatement: preparedInsert) { result in
+                                                                    XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+
+                                                                    connection.release(preparedStatement: preparedSelect) { result in
+                                                                        XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+
+                                                                        connection.release(preparedStatement: preparedSelect2) { result in
+                                                                            XCTAssertNil(result.asError, "Error in release statement: \(result.asError!)")
+                                                                            expectation.fulfill()
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
