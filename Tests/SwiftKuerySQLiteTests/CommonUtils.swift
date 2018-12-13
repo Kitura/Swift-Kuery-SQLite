@@ -157,7 +157,7 @@ class CommonUtils {
             return pool
         }
         
-        pool = SQLiteConnection.createPool(filename: "testDb.db", poolOptions: ConnectionPoolOptions(initialCapacity: 1, maxCapacity: 1, timeout: 10000))
+        pool = SQLiteConnection.createPool(filename: "testDb.db", poolOptions: ConnectionPoolOptions(initialCapacity: 1, maxCapacity: 1))
         return pool!
     }
 }
