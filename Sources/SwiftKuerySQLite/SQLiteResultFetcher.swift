@@ -21,6 +21,7 @@ import SwiftKuery
     import CSQLiteDarwin
 #endif
 import Foundation
+import Dispatch
 
 // MARK: SQLiteResultFetcher
 
@@ -61,41 +62,36 @@ public class SQLiteResultFetcher: ResultFetcher {
         }
     }
     
-    /// Fetch the next row of the query result. This function is blocking.
-    ///
-    /// - Returns: An array of values of type Any? representing the next row from the query result.
-    public func fetchNext() -> [Any?]? {
-        if let row = firstRow {
-            firstRow = nil
-            return row
-        }
-        guard hasMoreRows else {
-            return nil
-        }
-        let result = sqlite3_step(sqliteStatement)
-        switch result {
-        case SQLITE_ROW:
-            return buildRow()
-        default:
-            hasMoreRows = false
-            Utils.clear(statement: sqliteStatement, finalize: finalize)
-        }
-        return nil
-    }
-    
     /// Fetch the next row of the query result. This function is non-blocking.
     ///
     /// - Parameter callback: A callback to call when the next row of the query result is ready.
-    public func fetchNext(callback: ([Any?]?) ->()) {
-        // For now
-        callback(fetchNext())
+    public func fetchNext(callback: @escaping (([Any?]?, Error?)) -> ()) {
+        DispatchQueue.global().async {
+            if let row = self.firstRow {
+                self.firstRow = nil
+                return callback((row, nil))
+            }
+            guard self.hasMoreRows else {
+                return callback((nil,nil))
+            }
+            let result = sqlite3_step(self.sqliteStatement)
+            switch result {
+            case SQLITE_ROW:
+                return callback((self.buildRow(), nil))
+            default:
+                self.hasMoreRows = false
+                Utils.clear(statement: self.sqliteStatement, finalize: self.finalize)
+                return callback((nil, nil))
+            }
+        }
     }
     
-    /// Fetch the titles of the query result. This function is blocking.
+    /// Fetch the titles of the query result. This function is non-blocking.
     ///
-    /// - Returns: An array of column titles of type String.
-    public func fetchTitles() -> [String] {
-        return titles
+    /// - Parameter callback: A callback to call passing an array containing column titles of type String.
+    public func fetchTitles(callback: @escaping (([String]?, Error?)) -> ()) {
+        // As titles is already populated when this ResultFetcher is initialised we can simply return without blocking or offload.
+        callback((titles, nil))
     }
     
     private func buildRow() -> [Any?] {
