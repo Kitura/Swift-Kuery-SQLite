@@ -507,14 +507,17 @@ class SQLiteColumnBuilder: ColumnCreator {
         }
 
         var typeString = type.create(queryBuilder: queryBuilder)
+        if isInvalidIntegerType(typeString, queryBuilder) {
+            return nil
+        }
         if let length = column.length {
             typeString += "(\(length))"
         }
         if column.autoIncrement {
-            if column.isPrimaryKey && typeString == "integer" {
-                result += typeString + " PRIMARY KEY" + " AUTOINCREMENT"
+            // SQLite only allows you to define columns as integer primary key autoincrement but as SQLite is not strongly typed the resulting column is actually an 8 byte integer. As such we require the column to be bigint (Int64) to avoid truncation of values greater than INT32_MAX when reading from the database.
+            if column.isPrimaryKey && typeString == "bigint" {
+                result += "integer" + " PRIMARY KEY" + " AUTOINCREMENT"
             } else {
-                //SQLite only allows autoincrement on integer PRIMARY KEY columns so return nil
                 return nil
             }
         } else {
@@ -565,5 +568,15 @@ class SQLiteColumnBuilder: ColumnCreator {
         default:
             return String(describing: item)
         }
+    }
+
+    func isInvalidIntegerType(_ typeString: String, _ queryBuilder: QueryBuilder) -> Bool {
+        // Invalid integer types are Int16 and Int32
+        //Int16 - smallint
+        //Int32 - queryBuilder.substitutions[QueryBuilder.QuerySubstitutionNames.int32.rawValue]
+        if ((typeString == "smallint") || (typeString == queryBuilder.substitutions[QueryBuilder.QuerySubstitutionNames.int32.rawValue])) {
+            return true
+        }
+        return false
     }
 }

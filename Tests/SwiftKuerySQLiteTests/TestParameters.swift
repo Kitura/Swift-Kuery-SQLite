@@ -74,9 +74,9 @@ class TestParameters: XCTestCase {
                                 XCTAssertEqual(rows![0][0]! as! String, "apple", "Wrong value in row 0 column 0")
                                 XCTAssertEqual(rows![1][0]! as! String, "apricot", "Wrong value in row 1 column 0")
                                 XCTAssertEqual(rows![2][0]! as! String, "banana", "Wrong value in row 2 column 0")
-                                XCTAssertEqual(rows![0][1]! as! sqliteInt, 10, "Wrong value in row 0 column 1")
-                                XCTAssertEqual(rows![1][1]! as! sqliteInt, 3, "Wrong value in row 1 column 1")
-                                XCTAssertEqual(rows![2][1]! as! sqliteInt, -8, "Wrong value in row 2 column 1")
+                                XCTAssertEqual(rows![0][1]! as! Int64, 10, "Wrong value in row 0 column 1")
+                                XCTAssertEqual(rows![1][1]! as! Int64, 3, "Wrong value in row 1 column 1")
+                                XCTAssertEqual(rows![2][1]! as! Int64, -8, "Wrong value in row 2 column 1")
 
                                 let u1 = Update(t, set: [(t.a, Parameter()), (t.b, Parameter())], where: t.a == "banana")
                                 executeQueryWithParameters(query: u1, connection: connection, parameters: "peach", 2) { result, rows in
@@ -89,7 +89,7 @@ class TestParameters: XCTestCase {
                                         XCTAssertNotNil(rows, "SELECT returned no rows")
                                         XCTAssertEqual(rows!.count, 3, "SELECT returned wrong number of rows: \(rows!.count) instead of 3")
                                         XCTAssertEqual(rows![2][0]! as! String, "peach", "Wrong value in row 2 column 0")
-                                        XCTAssertEqual(rows![2][1]! as! sqliteInt, 2, "Wrong value in row 2 column 1")
+                                        XCTAssertEqual(rows![2][1]! as! Int64, 2, "Wrong value in row 2 column 1")
 
                                         let raw = "UPDATE \"" + t.tableName + "\" SET a = 'banana', b = $1 WHERE a = $2"
                                         executeRawQueryWithParameters(raw, connection: connection, parameters: 4, "peach") { result, rows in
@@ -102,7 +102,7 @@ class TestParameters: XCTestCase {
                                                 XCTAssertNotNil(rows, "SELECT returned no rows")
                                                 XCTAssertEqual(rows!.count, 3, "SELECT returned wrong number of rows: \(rows!.count) instead of 3")
                                                 XCTAssertEqual(rows![2][0]! as! String, "banana", "Wrong value in row 2 column 0")
-                                                XCTAssertEqual(rows![2][1]! as! sqliteInt, 4, "Wrong value in row 2 column 1")
+                                                XCTAssertEqual(rows![2][1]! as! Int64, 4, "Wrong value in row 2 column 1")
 
                                                 let u2 = Update(t, set: [(t.a, Parameter("first")), (t.b, Parameter("second"))], where: t.a == "banana")
                                                 executeQueryWithNamedParameters(query: u2, connection: connection, parameters: ["second":2, "first":"peach"]) { result, rows in
@@ -115,7 +115,7 @@ class TestParameters: XCTestCase {
                                                         XCTAssertNotNil(rows, "SELECT returned no rows")
                                                         XCTAssertEqual(rows!.count, 3, "SELECT returned wrong number of rows: \(rows!.count) instead of 3")
                                                         XCTAssertEqual(rows![2][0]! as! String, "peach", "Wrong value in row 2 column 0")
-                                                        XCTAssertEqual(rows![2][1]! as! sqliteInt, 2, "Wrong value in row 2 column 1")
+                                                        XCTAssertEqual(rows![2][1]! as! Int64, 2, "Wrong value in row 2 column 1")
 
                                                         let s2 = Select(from: t).where(t.a != Parameter())
                                                         executeQueryWithParameters(query: s2, connection: connection, parameters: nil) { result, rows in
@@ -138,7 +138,7 @@ class TestParameters: XCTestCase {
     
     class PreparedTable: Table {
         let a = Column("a", Varchar.self, length: 40)
-        let b = Column("b", Int32.self)
+        let b = Column("b", Int64.self)
         
         let tableName = tablePreparedStatements
     }
