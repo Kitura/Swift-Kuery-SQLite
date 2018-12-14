@@ -94,7 +94,10 @@ class TestSchema: XCTestCase {
                                       XCTAssertNotNil(result.asResultSet, "SELECT returned no rows")
                                       XCTAssertNotNil(rows, "SELECT returned no rows")
 
-                                      let resultSet = result.asResultSet
+                                      guard let resultSet = result.asResultSet else {
+                                          XCTFail("Expecting result set but returned nil")
+                                          return
+                                      }
                                       resultSet.getColumnTitles() { titles, error in
                                           guard let titles = titles else {
                                               XCTFail("No titles returned")
