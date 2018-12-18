@@ -82,15 +82,28 @@ You don't have to pass a filename, if you choose not to pass in a filename then 
 To establish a connection call:
 
 ```swift
-connection.connect(onCompletion: (QueryError?) -> ())
+connection.connect() { result in
+    guard result.success else {
+        // Connection unsuccessful
+        return
+    }
+    // Connection succesful
+    // Use connection
+}
 ```
 
 If you want to have multiple connections to your database you can create a `ConnectionPool` as follows:
 
 ```swift
-let pool = SQLiteConnection.createPool(filename: "myDB.db", poolOptions: ConnectionPoolOptions(initialCapacity: 10, maxCapacity: 30, timeout: 10000))
+let pool = SQLiteConnection.createPool(filename: "myDB.db", poolOptions: ConnectionPoolOptions(initialCapacity: 10, maxCapacity: 30))
 
-let connection = pool.getConnection()
+pool.getConnection() { connection, error in
+    guard let connection = connection else {
+        // Handle error
+        return
+    }
+    // Use connection
+}
 ```
 Note, you don't have to pass a filename to the `createPool` method, if you choose not to pass in a filename then your pool will be shared in-memory.
 
