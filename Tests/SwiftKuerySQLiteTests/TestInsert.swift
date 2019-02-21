@@ -23,10 +23,12 @@ import SwiftKuery
 let tableInsert = "tableInsertLinux"
 let tableInsert2 = "tableInsert2Linux"
 let tableInsert3 = "tableInsert3Linux"
+let tableInsert4 = "tableInsert4Linux"
 #else
 let tableInsert = "tableInsertOSX"
 let tableInsert2 = "tableInsert2OSX"
 let tableInsert3 = "tableInsert3OSX"
+let tableInsert4 = "tableInsert4OSX"
 #endif
 
 class TestInsert: XCTestCase {
@@ -35,6 +37,7 @@ class TestInsert: XCTestCase {
         return [
             ("testInsert", testInsert),
             ("testInsertID", testInsertID),
+            ("testDuplicateID", testDuplicateID),
         ]
     }
     
@@ -57,6 +60,12 @@ class TestInsert: XCTestCase {
         let b = Column("b")
 
         let tableName = tableInsert3
+    }
+
+    class MyTable4 : Table {
+        let a = Column("a", Int64.self, autoIncrement: true, primaryKey: true)
+
+        let tableName = tableInsert4
     }
 
     func testInsert() {
@@ -186,12 +195,50 @@ class TestInsert: XCTestCase {
                                 executeQuery(query: dropT3, connection: connection) { result, rows in
                                     XCTAssertEqual(result.success, true, "DROP TABLE failed")
                                     XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                    expectation.fulfill()
                                 }
                             }
                         }
                     }
                 }
-                expectation.fulfill()
+            }
+        })
+    }
+
+    func testDuplicateID() {
+        let t4 = MyTable4()
+
+        let pool = CommonUtils.sharedInstance.getConnectionPool()
+        performTest(asyncTasks: { expectation in
+
+            pool.getConnection { connection, error in
+                guard let connection = connection else {
+                    XCTFail("Failed to get connection")
+                    return
+                }
+                cleanUp(table: t4.tableName, connection: connection) { result in
+                    executeRawQuery("CREATE TABLE \"" +  t4.tableName + "\" (a INTEGER PRIMARY KEY AUTOINCREMENT)", connection: connection) { result, rows in
+                        XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                        XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
+                        let insert = Insert(into: t4, columns: [t4.a], values: [1], returnID: true)
+                        executeQuery(query: insert, connection: connection) { result, rows in
+                            XCTAssertEqual(result.success, true, "INSERT failed")
+                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                            executeQuery(query: insert, connection: connection) { result, rows in
+                                XCTAssertEqual(result.success, false, "Success when error expected")
+
+                                let dropT3 = Raw(query: "DROP TABLE", table: t4)
+                                executeQuery(query: dropT3, connection: connection) { result, rows in
+                                    XCTAssertEqual(result.success, true, "DROP TABLE failed")
+                                    XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                    expectation.fulfill()
+                                }
+                            }
+
+                        }
+                    }
+                }
             }
         })
     }
