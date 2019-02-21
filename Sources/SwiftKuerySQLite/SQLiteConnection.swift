@@ -236,17 +236,18 @@ public class SQLiteConnection: Connection {
             let sqliteQuery = try query.build(queryBuilder: queryBuilder)
 
             execute(sqliteQuery: sqliteQuery, parameters: parameters, namedParameters: namedParameters) { queryResult in
-              if let insertQuery = query as? Insert, insertQuery.returnID {
-                guard let idColumn = insertQuery.table.columns.first(where: {$0.isPrimaryKey && $0.autoIncrement}) else {
-                  onCompletion(.error(QueryError.syntaxError("Failed to find the ID column name")))
-                  return
+                // Only recover last insert ID if execute was succesful
+                if let insertQuery = query as? Insert, insertQuery.returnID, queryResult.success {
+                    guard let idColumn = insertQuery.table.columns.first(where: {$0.isPrimaryKey && $0.autoIncrement}) else {
+                        onCompletion(.error(QueryError.syntaxError("Failed to find the ID column name")))
+                        return
+                    }
+                    self.execute(sqliteQuery: "Select last_insert_rowid() as \(idColumn.name);", parameters: [Any?](), namedParameters: [:]) { queryResult in
+                        onCompletion(queryResult)
+                    }
+                } else {
+                    onCompletion(queryResult)
                 }
-                self.execute(sqliteQuery: "Select last_insert_rowid() as \(idColumn.name);", parameters: [Any?](), namedParameters: [:]) { queryResult in
-                  onCompletion(queryResult)
-                }
-              } else {
-                onCompletion(queryResult)
-              }
             }
         }
         catch QueryError.syntaxError(let error) {
