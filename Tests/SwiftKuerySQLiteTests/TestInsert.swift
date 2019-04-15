@@ -24,11 +24,13 @@ let tableInsert = "tableInsertLinux"
 let tableInsert2 = "tableInsert2Linux"
 let tableInsert3 = "tableInsert3Linux"
 let tableInsert4 = "tableInsert4Linux"
+let tableInsert5 = "tableInsert5Linux"
 #else
 let tableInsert = "tableInsertOSX"
 let tableInsert2 = "tableInsert2OSX"
 let tableInsert3 = "tableInsert3OSX"
 let tableInsert4 = "tableInsert4OSX"
+let tableInsert5 = "tableInsert5OSX"
 #endif
 
 class TestInsert: XCTestCase {
@@ -38,6 +40,7 @@ class TestInsert: XCTestCase {
             ("testInsert", testInsert),
             ("testInsertID", testInsertID),
             ("testDuplicateID", testDuplicateID),
+            ("testInsertNil", testInsertNil),
         ]
     }
     
@@ -66,6 +69,13 @@ class TestInsert: XCTestCase {
         let a = Column("a", Int64.self, autoIncrement: true, primaryKey: true)
 
         let tableName = tableInsert4
+    }
+
+    class MyTable5 : Table {
+        let a = Column("a", String.self)
+        let b = Column("b", Int64.self, autoIncrement:true, primaryKey: true)
+
+        let tableName = tableInsert5
     }
 
     func testInsert() {
@@ -236,6 +246,49 @@ class TestInsert: XCTestCase {
                                 }
                             }
 
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    func testInsertNil() {
+        let t = MyTable5()
+
+        let pool = CommonUtils.sharedInstance.getConnectionPool()
+        performTest(asyncTasks: { expectation in
+            pool.getConnection { connection, error in
+                guard let connection = connection else {
+                    XCTFail("Failed to get connection")
+                    return
+                }
+                cleanUp(table: t.tableName, connection: connection) { result in
+                    executeRawQuery("CREATE TABLE \"" +  t.tableName + "\" (a TEXT, b INTEGER PRIMARY KEY AUTOINCREMENT)", connection: connection) { result, rows in
+                        XCTAssertEqual(result.success, true, "CREATE TABLE failed")
+                        XCTAssertNil(result.asError, "Error in CREATE TABLE: \(result.asError!)")
+
+                        let optionalString: String? = nil
+                        let insertNil = Insert(into: t, values: optionalString, nil)
+                        executeQuery(query: insertNil, connection: connection) { result, rows in
+                            XCTAssertEqual(result.success, true, "INSERT failed")
+                            XCTAssertNil(result.asError, "Error in INSERT: \(result.asError!)")
+
+                            let select = Select(from: t)
+                            executeQuery(query: select, connection: connection) { result, rows in
+                                XCTAssertEqual(result.success, true, "SELECT failed")
+                                XCTAssertNil(result.asError, "Error in SELECT: \(result.asError!)")
+                                XCTAssertNotNil(rows, "SELECT returned no rows")
+                                XCTAssertEqual(rows?.count, 1, "SELECT returned wrong number of rows: \(String(describing: rows?.count)) instead of 1")
+                                XCTAssertNil(rows?[0][0], "Expected value `nil` not found, returned: \(String(describing: rows?[0][0])) instead")
+
+                                let drop = Raw(query: "DROP TABLE", table: t)
+                                executeQuery(query: drop, connection: connection) { result, rows in
+                                    XCTAssertEqual(result.success, true, "DROP TABLE failed")
+                                    XCTAssertNil(result.asError, "Error in DELETE: \(result.asError!)")
+                                    expectation.fulfill()
+                                }
+                            }
                         }
                     }
                 }
