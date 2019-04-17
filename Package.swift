@@ -28,7 +28,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", from: "3.0.0"),
+        //.package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", from: "3.0.0"),
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", .branch("insert_nulls_property")),
     ],
     targets: [
         .target(
