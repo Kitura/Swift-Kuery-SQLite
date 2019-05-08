@@ -17,9 +17,13 @@
 import SwiftKuery
 #if os(Linux)
     import CSQLiteLinux
-#else
+#elseif os(MacOS) || os(tvOS) || os(OSX) || os(watchOS) 
     import CSQLiteDarwin
+#else
+    // Unsupported Device. Perhaps try to error handle an import
+    print("Unknown Device.")
 #endif
+
 import Foundation
 import Dispatch
 
