@@ -1,27 +1,27 @@
 <p align="center">
-    <a href="http://kitura.io/">
-        <img src="https://raw.githubusercontent.com/IBM-Swift/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
+    <a href="https://www.kitura.dev">
+        <img src="https://raw.githubusercontent.com/Kitura/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html">
+    <a href="https://kitura.github.io/Swift-Kuery-SQLite/index.html">
     <img src="https://img.shields.io/badge/apidoc-SwiftKuerySQLite-1FBCE4.svg?style=flat" alt="APIDoc">
     </a>
-    <a href="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite">
-    <img src="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite.svg?branch=master" alt="Build Status - Master">
+    <a href="https://travis-ci.org/Kitura/Swift-Kuery-SQLite">
+    <img src="https://travis-ci.org/Kitura/Swift-Kuery-SQLite.svg?branch=master" alt="Build Status - Master">
     </a>
     <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
     <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
-    <a href="http://swift-at-ibm-slack.mybluemix.net/">
+    <a href="https://slack.kitura.dev">
     <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg" alt="Slack Status">
     </a>
 </p>
 
 # Swift-Kuery-SQLite
 
-[SQLite](https://sqlite.org/) plugin for the [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.
+[SQLite](https://sqlite.org/) plugin for the [Swift-Kuery](https://github.com/Kitura/Swift-Kuery) framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.
 
 ## SQLite installation
 
@@ -52,10 +52,10 @@ $ sudo apt-get install sqlite3 libsqlite3-dev
 
 #### Add dependencies
 
-Add the `Swift-Kuery-SQLite` package to the dependencies within your application’s `Package.swift` file. Substitute `"x.x.x"` with the latest `Swift-Kuery-SQLite` [release](https://github.com/IBM-Swift/Swift-Kuery-SQLite/releases).
+Add the `Swift-Kuery-SQLite` package to the dependencies within your application’s `Package.swift` file. Substitute `"x.x.x"` with the latest `Swift-Kuery-SQLite` [release](https://github.com/Kitura/Swift-Kuery-SQLite/releases).
 
 ```swift
-.package(url: "https://github.com/IBM-Swift/Swift-Kuery-SQLite.git", from: "x.x.x")
+.package(url: "https://github.com/Kitura/Swift-Kuery-SQLite.git", from: "x.x.x")
 ```
 
 Add `SwiftKuerySQLite` to your target's dependencies:
@@ -107,14 +107,14 @@ pool.getConnection() { connection, error in
 ```
 Note, you don't have to pass a filename to the `createPool` method, if you choose not to pass in a filename then your pool will be shared in-memory.
 
-You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the [Kuery](https://github.com/IBM-Swift/Swift-Kuery) documentation for more information, or see the [Database Connectivity with Kuery](https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html) chapter of the *[Kitura Until Dawn](https://www.gitbook.com/book/nocturnalsolutions/kitura-book)* guidebook/tutorial.
+You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the [Kuery](https://github.com/Kitura/Swift-Kuery) documentation for more information, or see the [Database Connectivity with Kuery](https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html) chapter of the *[Kitura Until Dawn](https://www.gitbook.com/book/nocturnalsolutions/kitura-book)* guidebook/tutorial.
 
 ## API Documentation
-For more information visit our [API reference](https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html).
+For more information visit our [API reference](https://kitura.github.io/Swift-Kuery-SQLite/index.html).
 
 ## Community
 
-We love to talk server-side Swift, and Kitura. Join our [Slack](http://swift-at-ibm-slack.mybluemix.net/) to meet the team!
+We love to talk server-side Swift, and Kitura. Join our [Slack](https://slack.kitura.dev) to meet the team!
 
 ## License
-This library is licensed under Apache 2.0. Full license text is available in [LICENSE](https://github.com/IBM-Swift/Swift-Kuery-SQLite/blob/master/LICENSE).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](https://github.com/Kitura/Swift-Kuery-SQLite/blob/master/LICENSE).

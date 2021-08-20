@@ -1,6 +1,6 @@
 module: SwiftKuerySQLite
 author: IBM
-github_url: https://github.com/IBM-Swift/Swift-Kuery-SQLite
+github_url: https://github.com/Kitura/Swift-Kuery-SQLite
 
 theme: fullwidth
 clean: true

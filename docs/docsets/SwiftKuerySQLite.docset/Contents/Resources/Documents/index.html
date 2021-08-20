@@ -32,7 +32,7 @@
       </p>
     
         <p class="header-col header-col--secondary">
-          <a class="header-link" href="https://github.com/IBM-Swift/Swift-Kuery-SQLite">
+          <a class="header-link" href="https://github.com/Kitura/Swift-Kuery-SQLite">
             <img class="header-icon" src="img/gh.png"/>
             View on GitHub
           </a>
@@ -84,28 +84,28 @@
           <div class="section-content">
             
             <p align="center">
-    <a href="http://kitura.io/">
-        <img src="https://raw.githubusercontent.com/IBM-Swift/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
+    <a href="https://www.kitura.dev">
+        <img src="https://raw.githubusercontent.com/Kitura/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html">
+    <a href="https://kitura.github.io/Swift-Kuery-SQLite/index.html">
     <img src="https://img.shields.io/badge/apidoc-SwiftKuerySQLite-1FBCE4.svg?style=flat" alt="APIDoc">
     </a>
-    <a href="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite">
-    <img src="https://travis-ci.org/IBM-Swift/Swift-Kuery-SQLite.svg?branch=master" alt="Build Status - Master">
+    <a href="https://travis-ci.org/Kitura/Swift-Kuery-SQLite">
+    <img src="https://travis-ci.org/Kitura/Swift-Kuery-SQLite.svg?branch=master" alt="Build Status - Master">
     </a>
     <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
     <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
-    <a href="http://swift-at-ibm-slack.mybluemix.net/">
+    <a href="https://slack.kitura.dev">
     <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg" alt="Slack Status">
     </a>
 </p>
 <h1 id='swift-kuery-sqlite' class='heading'>Swift-Kuery-SQLite</h1>
 
-<p><a href="https://sqlite.org/">SQLite</a> plugin for the <a href="https://github.com/IBM-Swift/Swift-Kuery">Swift-Kuery</a> framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.</p>
+<p><a href="https://sqlite.org/">SQLite</a> plugin for the <a href="https://github.com/Kitura/Swift-Kuery">Swift-Kuery</a> framework. It enables you to use Swift-Kuery to manipulate data in an SQLite database.</p>
 <h2 id='sqlite-installation' class='heading'>SQLite installation</h2>
 
 <p>To use Swift-Kuery-SQLite you must install SQLite.</p>
@@ -126,8 +126,8 @@ $ ln -s /opt/local/include/sqlite3.h /usr/local/opt/sqlite/include/
 <h2 id='usage' class='heading'>Usage</h2>
 <h4 id='add-dependencies' class='heading'>Add dependencies</h4>
 
-<p>Add the <code>Swift-Kuery-SQLite</code> package to the dependencies within your application’s <code>Package.swift</code> file. Substitute <code>&quot;x.x.x&quot;</code> with the latest <code>Swift-Kuery-SQLite</code> <a href="https://github.com/IBM-Swift/Swift-Kuery-SQLite/releases">release</a>.</p>
-<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/Swift-Kuery-SQLite.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"x.x.x"</span><span class="p">)</span>
+<p>Add the <code>Swift-Kuery-SQLite</code> package to the dependencies within your application’s <code>Package.swift</code> file. Substitute <code>&quot;x.x.x&quot;</code> with the latest <code>Swift-Kuery-SQLite</code> <a href="https://github.com/Kitura/Swift-Kuery-SQLite/releases">release</a>.</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/Kitura/Swift-Kuery-SQLite.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"x.x.x"</span><span class="p">)</span>
 </code></pre>
 
 <p>Add <code>SwiftKuerySQLite</code> to your target&rsquo;s dependencies:</p>
@@ -169,16 +169,16 @@ $ ln -s /opt/local/include/sqlite3.h /usr/local/opt/sqlite/include/
 
 <p>Note, you don&rsquo;t have to pass a filename to the <code>createPool</code> method, if you choose not to pass in a filename then your pool will be shared in-memory.</p>
 
-<p>You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the <a href="https://github.com/IBM-Swift/Swift-Kuery">Kuery</a> documentation for more information, or see the <a href="https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html">Database Connectivity with Kuery</a> chapter of the <em><a href="https://www.gitbook.com/book/nocturnalsolutions/kitura-book">Kitura Until Dawn</a></em> guidebook/tutorial.</p>
+<p>You now have a connection that can be used to execute SQL queries created using Swift-Kuery. View the <a href="https://github.com/Kitura/Swift-Kuery">Kuery</a> documentation for more information, or see the <a href="https://nocturnalsolutions.gitbooks.io/kitura-book/content/5-kuery.html">Database Connectivity with Kuery</a> chapter of the <em><a href="https://www.gitbook.com/book/nocturnalsolutions/kitura-book">Kitura Until Dawn</a></em> guidebook/tutorial.</p>
 <h2 id='api-documentation' class='heading'>API Documentation</h2>
 
-<p>For more information visit our <a href="https://ibm-swift.github.io/Swift-Kuery-SQLite/index.html">API reference</a>.</p>
+<p>For more information visit our <a href="https://kitura.github.io/Swift-Kuery-SQLite/index.html">API reference</a>.</p>
 <h2 id='community' class='heading'>Community</h2>
 
-<p>We love to talk server-side Swift, and Kitura. Join our <a href="http://swift-at-ibm-slack.mybluemix.net/">Slack</a> to meet the team!</p>
+<p>We love to talk server-side Swift, and Kitura. Join our <a href="https://slack.kitura.dev">Slack</a> to meet the team!</p>
 <h2 id='license' class='heading'>License</h2>
 
-<p>This library is licensed under Apache 2.0. Full license text is available in <a href="https://github.com/IBM-Swift/Swift-Kuery-SQLite/blob/master/LICENSE">LICENSE</a>.</p>
+<p>This library is licensed under Apache 2.0. Full license text is available in <a href="https://github.com/Kitura/Swift-Kuery-SQLite/blob/master/LICENSE">LICENSE</a>.</p>
 
           </div>
         </section>
